@@ -15,8 +15,6 @@ def test_basic_options():
     print("Test 1: Basic Options (no args)")
     print("=" * 60)
     options = Options()
-    print(f"Game to parse: {options.game_to_parse}")
-    print(f"Should parse: {options.should_parse}")
     print()
 
 def test_with_args():
@@ -30,8 +28,6 @@ def test_with_args():
     # Simulate command line args
     args = parser.parse_args(['--should-parse', '--game-to-parse', 'TestGame'])
     options = Options(args)
-    print(f"Should parse: {options.should_parse}")
-    print(f"Game to parse: {options.game_to_parse}")
     print()
 
 def test_init_options():
