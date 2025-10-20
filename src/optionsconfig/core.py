@@ -12,8 +12,22 @@ load_dotenv()
 Central configuration schema to provide a single source of truth for all documentation and functionality of options/args
 """
 
-from options_schema import OPTIONS_SCHEMA
 from argparse import ArgumentParser, Namespace
+
+def get_schema() -> dict:
+    """Dynamically load OPTIONS_SCHEMA from the calling project."""
+    try:
+        # First try environment variable override
+        schema_module = os.getenv('OPTIONS_SCHEMA_MODULE', 'options_schema')
+        module = __import__(schema_module)
+        return module.OPTIONS_SCHEMA
+    except ImportError:
+        raise ImportError(
+            "No OPTIONS_SCHEMA found. Please create an options_schema.py "
+            "in your project root with an OPTIONS_SCHEMA dictionary."
+        )
+    
+OPTIONS_SCHEMA = get_schema()
 
 class ArgumentWriter:
     """
