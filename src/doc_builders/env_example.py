@@ -6,15 +6,11 @@ This script creates a new .env.example file based on the option schema,
 ensuring documentation stays in sync with the actual option definitions.
 """
 
-import os
 import sys
 from pathlib import Path
 from typing import Dict, Any, Set
 
-# Add src directory to path to import options module
-src_path = Path(__file__).parent.parent / "src"
-sys.path.insert(0, str(src_path))
-
+sys.path.append(str(Path(__file__).parent.parent))
 from options_schema import OPTIONS_SCHEMA
 
 

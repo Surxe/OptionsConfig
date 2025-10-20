@@ -10,9 +10,9 @@ import os
 def update_readme_with_markers():
     """Update README.md content between markers."""
     
-    repo_root = Path(__file__).parent.parent
+    repo_root = Path(__file__).parent.parent.parent
     readme_path = repo_root / "README.md"
-    options_doc_path = Path(__file__).parent.parent / ".temp" / "readme_options_section.md"
+    options_doc_path = repo_root / ".temp" / "readme_options_section.md"
     os.makedirs(options_doc_path.parent, exist_ok=True)
     
     if not readme_path.exists():
@@ -20,7 +20,7 @@ def update_readme_with_markers():
         return False
     
     if not options_doc_path.exists():
-        print("Generated option docs not found. Run readme_options.py first.")
+        print(f"Generated option docs not found at {options_doc_path}. Run readme_options.py first.")
         return False
     
     # Read files

@@ -6,9 +6,6 @@ This script:
 1. Generates .env.example from OPTIONS_SCHEMA
 2. Generates README option documentation  
 3. Updates README.md with the generated content
-
-Usage:
-    python build/build_docs_simple.py
 """
 
 import subprocess

@@ -10,11 +10,8 @@ import os
 import sys
 from pathlib import Path
 
-# Add src directory to path to import options module
-src_path = Path(__file__).parent.parent / "src"
-sys.path.insert(0, str(src_path))
-
-from options_schema import OPTIONS_SCHEMA
+sys.path.append(str(Path(__file__).parent.parent.parent))
+from src.options_schema import OPTIONS_SCHEMA
 
 
 def generate_by_process_section():
@@ -111,7 +108,7 @@ def generate_full_option_section():
 
 def write_option_docs():
     """Write option documentation to files."""
-    build_dir = Path(__file__).parent.parent / ".temp"
+    build_dir = Path(__file__).parent.parent.parent / ".temp"
     os.makedirs(build_dir, exist_ok=True)
     
     # Generate different formats
@@ -128,7 +125,7 @@ def write_option_docs():
 
 def validate_generated_docs():
     """Validate that the generated documentation looks correct."""
-    build_dir = Path(__file__).parent.parent / ".temp"
+    build_dir = Path(__file__).parent.parent.parent / ".temp"
     
     files_to_check = [
         "readme_options_section.md"
