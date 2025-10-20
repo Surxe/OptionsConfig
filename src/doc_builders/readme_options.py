@@ -10,7 +10,8 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).parent.parent.parent))
+REPO_PATH = Path(__file__).parent.parent.parent
+sys.path.append(str(REPO_PATH))
 from src.options_schema import OPTIONS_SCHEMA
 
 
@@ -108,7 +109,7 @@ def generate_full_option_section():
 
 def write_option_docs():
     """Write option documentation to files."""
-    build_dir = Path(__file__).parent.parent.parent / ".temp"
+    build_dir = REPO_PATH / ".temp"
     os.makedirs(build_dir, exist_ok=True)
     
     # Generate different formats
@@ -125,7 +126,7 @@ def write_option_docs():
 
 def validate_generated_docs():
     """Validate that the generated documentation looks correct."""
-    build_dir = Path(__file__).parent.parent.parent / ".temp"
+    build_dir = REPO_PATH / ".temp"
     
     files_to_check = [
         "readme_options_section.md"

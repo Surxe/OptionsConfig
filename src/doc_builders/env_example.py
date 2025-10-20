@@ -10,8 +10,9 @@ import sys
 from pathlib import Path
 from typing import Dict, Any, Set
 
-sys.path.append(str(Path(__file__).parent.parent))
-from options_schema import OPTIONS_SCHEMA
+REPO_PATH = Path(__file__).parent.parent.parent
+sys.path.append(str(REPO_PATH))
+from src.options_schema import OPTIONS_SCHEMA
 
 
 def generate_env_example() -> str:
@@ -24,7 +25,7 @@ def generate_env_example() -> str:
     
     lines = header + [""]  # Add blank line after header
     
-    def process_option(option_name: str, details: Dict[str, Any]) -> None:
+    def process_option(details: Dict[str, Any]) -> None:
         """Process a single option and add it to the lines."""
         env_var = details["env"]
         help_text = details.get("help", "")
@@ -88,16 +89,16 @@ def generate_env_example() -> str:
         lines.append(f"# {section}")
         
         # Process all options in this section
-        for option_name, details in sections_data[section]:
-            process_option(option_name, details)
+        for _, details in sections_data[section]:
+            process_option(details)
     
     return "\n".join(lines)
 
 
 def update_env_example() -> bool:
     """Update the .env.example file with generated content."""
-    repo_root = Path(__file__).parent.parent
-    env_example_path = repo_root / ".env.example"
+    
+    env_example_path = REPO_PATH / ".env.example"
     
     try:
         # Generate new content
@@ -130,8 +131,8 @@ def update_env_example() -> bool:
 
 def validate_generated_file() -> bool:
     """Validate that the generated .env.example file is properly formatted."""
-    repo_root = Path(__file__).parent.parent
-    env_example_path = repo_root / ".env.example"
+    REPO_PATH = Path(__file__).parent.parent
+    env_example_path = REPO_PATH / ".env.example"
     
     if not env_example_path.exists():
         print(f"Generated file {env_example_path} does not exist")
