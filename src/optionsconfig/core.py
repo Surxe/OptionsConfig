@@ -26,16 +26,14 @@ def get_schema() -> dict:
             "No OPTIONS_SCHEMA found. Please create an options_schema.py "
             "in your project root with an OPTIONS_SCHEMA dictionary."
         )
-    
-OPTIONS_SCHEMA = get_schema()
 
 class ArgumentWriter:
     """
     Helper class to write command line arguments based on OPTIONS_SCHEMA
     """
 
-    def __init__(self):
-        self.schema = OPTIONS_SCHEMA
+    def __init__(self, schema: dict | None = None):
+        self.schema = schema if schema is not None else get_schema()
 
     def add_arguments(self, parser: ArgumentParser):
         for option_name, details in self.schema.items():
@@ -64,7 +62,8 @@ class Options:
     """
     A class to hold options for the application.
     """
-    def __init__(self, args: Namespace | None = None):
+    def __init__(self, args: Namespace | None = None, schema: dict | None = None):
+        self.schema = schema if schema is not None else get_schema()
 
         # Initialize all options in the following preference
         # 1. Direct args (if provided)
@@ -79,17 +78,17 @@ class Options:
 
         # Identify root options (options that other options depend on)
         self.root_options = []
-        for option_name, details in OPTIONS_SCHEMA.items():
+        for option_name, details in self.schema.items():
             # An option is a root option if other options depend on it
             is_root = any(
-                option_name in OPTIONS_SCHEMA[other_option].get("depends_on", [])
-                for other_option in OPTIONS_SCHEMA
+                option_name in self.schema[other_option].get("depends_on", [])
+                for other_option in self.schema
             )
             if is_root:
                 self.root_options.append(option_name)
 
         # Process the schema to set all attributes
-        options = self._process_schema(OPTIONS_SCHEMA, args_dict)
+        options = self._process_schema(self.schema, args_dict)
 
         # Set attributes dynamically using lowercase underscore format
         for key, value in options.items():
@@ -165,10 +164,10 @@ class Options:
         # Check if any root option was explicitly provided (not just defaulted from schema)
         explicitly_set_root_options = []
         for root_option in self.root_options:
-            attr_name = OPTIONS_SCHEMA[root_option]["arg"].lstrip('--').replace('-', '_')
+            attr_name = self.schema[root_option]["arg"].lstrip('--').replace('-', '_')
             # Check if it was in args or environment
             if (attr_name in args_dict and args_dict[attr_name] is not None) or \
-               OPTIONS_SCHEMA[root_option]["env"] in os.environ:
+               self.schema[root_option]["env"] in os.environ:
                 explicitly_set_root_options.append(root_option)
         
         if not explicitly_set_root_options:
@@ -184,7 +183,7 @@ class Options:
         options_as_dict = {k.upper(): v for k, v in self.__dict__.items() if k != 'root_options'}
         
         # Check each option that has dependencies
-        for option_name, details in OPTIONS_SCHEMA.items():
+        for option_name, details in self.schema.items():
             depends_on_list = details.get("depends_on", [])
             if not depends_on_list:
                 continue
@@ -216,7 +215,7 @@ class Options:
         # Dynamically log all attributes that were set from the schema
         log_lines = ["Options initialized with:"]
         
-        for option_name, details in OPTIONS_SCHEMA.items():
+        for option_name, details in self.schema.items():
             attr_name = details["arg"].lstrip('--').replace('-', '_')
             if hasattr(self, attr_name):
                 value = getattr(self, attr_name)
@@ -228,9 +227,9 @@ class Options:
         logger.info("\n".join(log_lines))
     
 # Helper to initialize OPTIONS with direct args if available
-def init_options(args: Namespace | None = None):
+def init_options(args: Namespace | None = None, schema: dict | None = None) -> Options:
     global OPTIONS
-    OPTIONS = Options(args)
+    OPTIONS = Options(args, schema)
     return OPTIONS
 
 def is_truthy(string):
