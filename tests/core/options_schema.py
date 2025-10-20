@@ -11,15 +11,15 @@ OPTIONS_SCHEMA = {
         "type": bool,
         "default": False,
         "section": "Parse",
-        "help": "Whether to parse the game files after downloading."
+        "help": "Whether to parse the game files."
     },
-    "GAME_NAME": {
-        "env": "GAME_NAME",
-        "arg": "--game-name",
+    "GAME_TO_PARSE": {
+        "env": "GAME_TO_PARSE",
+        "arg": "--game-to-parse",
         "type": str,
         "default": "WRFrontiers",
         "section": "Parse",
         "depends_on": ["SHOULD_PARSE"],
-        "help": "Name of the game to download."
+        "help": "Name of the game to parse."
     },
 }
