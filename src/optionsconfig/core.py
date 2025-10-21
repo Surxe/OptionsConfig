@@ -14,18 +14,67 @@ Central configuration schema to provide a single source of truth for all documen
 
 from argparse import ArgumentParser, Namespace
 
-def get_schema() -> dict:
-    """Dynamically load OPTIONS_SCHEMA from the calling project."""
+def get_schema(schema: dict | None = None) -> dict:
+    """
+    Load OPTIONS_SCHEMA from available sources.
+    
+    Priority order:
+    1. Direct schema dict passed as argument
+    2. Configuration file (pyproject.toml)
+    
+    Args:
+        schema: Direct schema dict to use
+    
+    Returns:
+        The OPTIONS_SCHEMA dictionary
+    
+    Raises:
+        ImportError: If no schema can be found
+    """
+    # 1. Direct schema dict
+    if schema is not None:
+        return schema
+    
+    # 2. Configuration file (pyproject.toml)
+    config_schema = _load_schema_from_config()
+    if config_schema:
+        return config_schema
+    
+    raise ImportError(
+        "No OPTIONS_SCHEMA found.\n"
+        "Please either:\n"
+        "1. Pass schema directly: Options(schema=YOUR_SCHEMA)\n"
+        "2. Configure [tool.optionsconfig] schema_module in pyproject.toml"
+    )
+
+
+def _load_schema_from_config() -> dict | None:
+    """Load schema module path from pyproject.toml."""
     try:
-        # First try environment variable override
-        schema_module = os.getenv('OPTIONS_SCHEMA_MODULE', 'options_schema')
-        module = __import__(schema_module)
-        return module.OPTIONS_SCHEMA
+        import tomllib
     except ImportError:
-        raise ImportError(
-            "No OPTIONS_SCHEMA found. Please create an options_schema.py "
-            "in your project root with an OPTIONS_SCHEMA dictionary."
-        )
+        try:
+            import tomli as tomllib
+        except ImportError:
+            # Python < 3.11 and tomli not installed, skip this method
+            return None
+    
+    config_file = Path('pyproject.toml')
+    if not config_file.exists():
+        return None
+    
+    with open(config_file, 'rb') as f:
+        config = tomllib.load(f)
+    
+    schema_module = config.get('tool', {}).get('optionsconfig', {}).get('schema_module')
+    if schema_module:
+        module = __import__(schema_module, fromlist=['OPTIONS_SCHEMA'])
+        return module.OPTIONS_SCHEMA
+    
+    raise ImportError(
+        "No OPTIONS_SCHEMA found in configuration file.\n"
+        "Please ensure [tool.optionsconfig] schema_module is set in pyproject.toml"
+    )
 
 class ArgumentWriter:
     """
@@ -33,7 +82,7 @@ class ArgumentWriter:
     """
 
     def __init__(self, schema: dict | None = None):
-        self.schema = schema if schema is not None else get_schema()
+        self.schema = get_schema(schema=schema)
 
     def add_arguments(self, parser: ArgumentParser):
         for option_name, details in self.schema.items():
@@ -63,7 +112,7 @@ class Options:
     A class to hold options for the application.
     """
     def __init__(self, args: Namespace | None = None, schema: dict | None = None):
-        self.schema = schema if schema is not None else get_schema()
+        self.schema = get_schema(schema=schema)
 
         # Initialize all options in the following preference
         # 1. Direct args (if provided)
@@ -229,7 +278,7 @@ class Options:
 # Helper to initialize OPTIONS with direct args if available
 def init_options(args: Namespace | None = None, schema: dict | None = None) -> Options:
     global OPTIONS
-    OPTIONS = Options(args, schema)
+    OPTIONS = Options(args=args, schema=schema)
     return OPTIONS
 
 def is_truthy(string):
