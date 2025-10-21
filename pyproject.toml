@@ -29,6 +29,10 @@ toml = [
 # Users of this package would set their own schema module here
 schema_module = "src.options_schema"
 
+# Optional: Specify custom path for .env.example file
+# If not set, defaults to repository root
+# env_example_path = ".env.example"
+
 [project.urls]
 Homepage = "https://github.com/yourusername/OptionsConfig"
 Repository = "https://github.com/yourusername/OptionsConfig"

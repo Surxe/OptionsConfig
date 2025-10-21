@@ -14,8 +14,16 @@ from typing import Dict, Any
 class EnvBuilder:
     """Class to build .env.example from OPTIONS_SCHEMA."""
 
-    def __init__(self, schema: dict):
-        self.env_example_file = self._get_env_example_path()
+    def __init__(self, schema: dict, env_example_path: str | Path | None = None):
+        """
+        Initialize EnvBuilder.
+        
+        Args:
+            schema: The OPTIONS_SCHEMA dictionary
+            env_example_path: Optional path to .env.example file.
+                             If None, will check pyproject.toml or use default.
+        """
+        self.env_example_file = self._get_env_example_path(env_example_path)
         self.schema = schema
 
     def build(self) -> bool:
@@ -29,12 +37,60 @@ class EnvBuilder:
 
         return True
 
-    def _get_env_example_path(self) -> Path:
-        env_example_file = os.getenv("ENV_EXAMPLE_FILE", None)
-        if env_example_file is None:
-            return Path(__file__).parent.parent.parent.parent / ".env.example"
-        else:
-            return Path(env_example_file)
+    def _get_env_example_path(self, env_example_path: str | Path | None = None) -> Path:
+        """
+        Get the path to the .env.example file.
+        
+        Priority order:
+        1. Direct path parameter
+        2. Configuration file (pyproject.toml)
+        3. Default location (repository root)
+        
+        Args:
+            env_example_path: Optional direct path to .env.example file
+            
+        Returns:
+            Path to .env.example file
+        """
+        # 1. Direct path parameter
+        if env_example_path is not None:
+            return Path(env_example_path)
+        
+        # 2. Configuration file (pyproject.toml)
+        config_path = self._load_path_from_config()
+        if config_path:
+            return config_path
+        
+        # 3. Default location
+        return Path(__file__).parent.parent.parent.parent / ".env.example"
+    
+    def _load_path_from_config(self) -> Path | None:
+        """Load env example file path from pyproject.toml."""
+        try:
+            import tomllib
+        except ImportError:
+            try:
+                import tomli as tomllib
+            except ImportError:
+                # Python < 3.11 and tomli not installed, skip this method
+                return None
+        
+        config_file = Path('pyproject.toml')
+        if not config_file.exists():
+            return None
+        
+        try:
+            with open(config_file, 'rb') as f:
+                config = tomllib.load(f)
+            
+            env_path = config.get('tool', {}).get('optionsconfig', {}).get('env_example_path')
+            if env_path:
+                return Path(env_path)
+        except Exception:
+            # If any error occurs reading config, return None
+            pass
+        
+        return None
 
     def _generate_env_example(self) -> str:
         """Generate .env.example content from schema."""
@@ -141,7 +197,7 @@ class EnvBuilder:
             print(f"Processed {option_count} options ({option_count - dependent_count} root + {dependent_count} dependent)")
             
         except Exception as e:
-            print(f"Error updating .env.example: {e}")
+            print(f"Error updating env example: {e}")
             return False
         
         return True
