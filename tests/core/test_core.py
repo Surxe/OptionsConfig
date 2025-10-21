@@ -10,11 +10,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 from optionsconfig.core import Options, ArgumentWriter, init_options
 import argparse
 
+# Import the test schema from this directory
+from options_schema import OPTIONS_SCHEMA
+
 def test_basic_options():
     print("=" * 60)
     print("Test 1: Basic Options (no args)")
     print("=" * 60)
-    options = Options()
+    options = Options(schema=OPTIONS_SCHEMA)
     print()
 
 def test_with_args():
@@ -22,19 +25,19 @@ def test_with_args():
     print("Test 2: Options with CLI args")
     print("=" * 60)
     parser = argparse.ArgumentParser()
-    writer = ArgumentWriter()
+    writer = ArgumentWriter(schema=OPTIONS_SCHEMA)
     writer.add_arguments(parser)
     
     # Simulate command line args
     args = parser.parse_args(['--should-parse', '--game-to-parse', 'TestGame'])
-    options = Options(args)
+    options = Options(args, schema=OPTIONS_SCHEMA)
     print()
 
 def test_init_options():
     print("=" * 60)
     print("Test 3: Using init_options()")
     print("=" * 60)
-    options = init_options()
+    options = init_options(schema=OPTIONS_SCHEMA)
     print(f"Options initialized: {type(options)}")
     print()
 

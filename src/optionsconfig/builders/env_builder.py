@@ -123,10 +123,10 @@ class EnvBuilder:
             new_content = self._generate_env_example()
             
             # Write to .env.example
-            with open(self.env_example_path, "w", encoding="utf-8") as f:
+            with open(self.env_example_file, "w", encoding="utf-8") as f:
                 f.write(new_content)
             
-            print(f"Successfully updated {self.env_example_path}")
+            print(f"Successfully updated {self.env_example_file}")
             print(f"Generated {len(new_content.splitlines())} lines")
             
             # Show summary of options
@@ -150,12 +150,12 @@ class EnvBuilder:
     def _validate_generated_file(self) -> bool:
         """Validate that the generated .env.example file is properly formatted."""
         
-        if not self.env_example_path.exists():
-            print(f"Generated file {self.env_example_path} does not exist")
+        if not self.env_example_file.exists():
+            print(f"Generated file {self.env_example_file} does not exist")
             return False
         
         try:
-            with open(self.env_example_path, "r", encoding="utf-8") as f:
+            with open(self.env_example_file, "r", encoding="utf-8") as f:
                 lines = f.readlines()
             
             # Basic validation checks

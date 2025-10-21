@@ -7,13 +7,14 @@ from pathlib import Path
 # Add src to path for local testing
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from optionsconfig.core import get_schema
-import argparse
 from optionsconfig.builders.env_builder import EnvBuilder
 
+# Import the test schema from this directory
+from options_schema import OPTIONS_SCHEMA
+
 def test_with_args():
-    schema = get_schema()
-    env_builder = EnvBuilder(schema)
+    # Pass the schema directly instead of relying on auto-discovery
+    EnvBuilder(OPTIONS_SCHEMA).build()
 
 if __name__ == "__main__":
     test_with_args()

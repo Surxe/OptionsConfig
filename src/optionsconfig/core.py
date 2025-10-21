@@ -63,18 +63,19 @@ def _load_schema_from_config() -> dict | None:
     if not config_file.exists():
         return None
     
-    with open(config_file, 'rb') as f:
-        config = tomllib.load(f)
+    try:
+        with open(config_file, 'rb') as f:
+            config = tomllib.load(f)
+        
+        schema_module = config.get('tool', {}).get('optionsconfig', {}).get('schema_module')
+        if schema_module:
+            module = __import__(schema_module, fromlist=['OPTIONS_SCHEMA'])
+            return module.OPTIONS_SCHEMA
+    except Exception:
+        # If any error occurs reading config or importing module, return None
+        pass
     
-    schema_module = config.get('tool', {}).get('optionsconfig', {}).get('schema_module')
-    if schema_module:
-        module = __import__(schema_module, fromlist=['OPTIONS_SCHEMA'])
-        return module.OPTIONS_SCHEMA
-    
-    raise ImportError(
-        "No OPTIONS_SCHEMA found in configuration file.\n"
-        "Please ensure [tool.optionsconfig] schema_module is set in pyproject.toml"
-    )
+    return None
 
 class ArgumentWriter:
     """
