@@ -187,7 +187,7 @@ cython_debug/
 .env.example
 
 # Temp output for tests
-tests/builders/env.example
-tests/builders/*.env.example
-tests/builders/*_README.md
-tests/builders/TEST_README.md
+tests/builders/env_builder/*.env.example
+tests/builders/readme_builder/*.md
+tests/builders/integration/*.env.example
+tests/builders/integration/*_README.md

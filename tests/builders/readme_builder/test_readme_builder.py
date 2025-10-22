@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 # Add src to path for local testing
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src"))
 
 from optionsconfig.builders.readme_builder import ReadmeBuilder
 
@@ -55,6 +55,6 @@ More content after.
     print("Generated README content validated successfully!")
 
 if __name__ == "__main__":
-    readme_path = Path('tests/builders/TEST_README.md')
+    readme_path = Path('tests/builders/readme_builder/TEST_README.md')
     test(readme_path)
     print("All tests completed!")

@@ -5,9 +5,8 @@ import sys
 from pathlib import Path
 
 # Add src to path for local testing
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src"))
 
-from optionsconfig.core import get_schema
 from optionsconfig.builders import EnvBuilder, ReadmeBuilder
 
 # Import the test schema from this directory
@@ -17,8 +16,8 @@ def test_build_all():
     """Test that both builders work together."""
     
     # Setup paths
-    env_path = Path('tests/builders/test_all.env.example')
-    readme_path = Path('tests/builders/test_all_README.md')
+    env_path = Path('tests/builders/integration/test_all.env.example')
+    readme_path = Path('tests/builders/integration/test_all_README.md')
     
     # Create a test README with markers
     test_readme_content = """# Test README
