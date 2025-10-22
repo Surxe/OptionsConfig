@@ -23,5 +23,4 @@ class OptionDefinition(TypedDict, total=False):
 
 def validate_schema(schema: dict) -> bool:
     """Validate user's OPTIONS_SCHEMA follows required format."""
-    # Validation logic here
     pass

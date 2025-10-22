@@ -33,6 +33,10 @@ schema_module = "src.options_schema"
 # If not set, defaults to repository root
 # env_example_path = ".env.example"
 
+# Optional: Specify custom path for README.md file
+# If not set, defaults to repository root
+# readme_path = "README.md"
+
 [project.urls]
 Homepage = "https://github.com/yourusername/OptionsConfig"
 Repository = "https://github.com/yourusername/OptionsConfig"
