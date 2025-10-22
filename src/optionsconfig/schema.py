@@ -86,9 +86,8 @@ def _load_schema_from_config() -> dict | None:
         if schema_module:
             module = __import__(schema_module, fromlist=['OPTIONS_SCHEMA'])
             return module.OPTIONS_SCHEMA
-    except Exception:
-        # If any error occurs reading config or importing module, return None
-        pass
+    except ImportError as e:
+        raise ImportError(f"Could not import schema module '{schema_module}': {e}")
     
     return None
 
