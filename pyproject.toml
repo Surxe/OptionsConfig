@@ -42,5 +42,5 @@ toml = [
 # log_file = "logs/app.log"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/OptionsConfig"
-Repository = "https://github.com/yourusername/OptionsConfig"
+Homepage = "https://github.com/Surxe/OptionsConfig"
+Repository = "https://github.com/Surxe/OptionsConfig"
