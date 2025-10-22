@@ -196,11 +196,12 @@ class ReadmeBuilder:
             
             # Check if markers exist
             if start_marker not in readme_content or end_marker not in readme_content:
-                print("Markers not found in README.md")
-                print("Add these markers where you want the option docs:")
-                print(f"    {start_marker}")
-                print(f"    {end_marker}")
-                return False
+                raise ValueError(
+                    f"Markers not found in {self.readme_file}\n"
+                    f"Add these markers where you want the option docs:\n"
+                    f"    {start_marker}\n"
+                    f"    {end_marker}"
+                )
             
             # Replace content between markers
             pattern = f"{re.escape(start_marker)}.*?{re.escape(end_marker)}"
@@ -225,6 +226,9 @@ class ReadmeBuilder:
             
             print(f"Processed {option_count} options ({option_count - dependent_count} root + {dependent_count} dependent)")
             
+        except ValueError:
+            # Re-raise ValueError (e.g., markers not found)
+            raise
         except Exception as e:
             print(f"Error updating README: {e}")
             return False
