@@ -25,9 +25,9 @@ toml = [
 ]
 
 [tool.optionsconfig]
-# Configuration for this repository's own OPTIONS_SCHEMA
+# Example configuration for projects using this package
 # Users of this package would set their own schema module here
-schema_module = "src.options_schema"
+# schema_module = "myapp.config.options_schema"
 
 # Optional: Specify custom path for .env.example file
 # If not set, defaults to repository root
