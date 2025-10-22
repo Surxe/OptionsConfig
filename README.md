@@ -29,6 +29,8 @@ After installation, the `optionsconfig` command will be available in your termin
 
 ## Quick Start
 
+> **📘 For detailed integration instructions, see [USAGE_GUIDE.md](USAGE_GUIDE.md)**
+
 ### 1. Define Your Schema
 
 Create an `options_schema.py` file in your project:
@@ -295,7 +297,14 @@ MIT License - see LICENSE file for details
 
 Contributions welcome! TODO
 
+## Documentation
+
+- **[Quick Reference](QUICK_REFERENCE.md)** - Cheat sheet for common tasks
+- **[Usage Guide](USAGE_GUIDE.md)** - Complete guide for using OptionsConfig in your projects
+- **[Schema Loading](SCHEMA_LOADING.md)** - Detailed information on schema configuration
+- **[Installation Test](INSTALL_TEST.md)** - Verify your installation
+
 ## Links
 
 - **Repository**: https://github.com/Surxe/OptionsConfig
-- **Documentation**: [SCHEMA_LOADING.md](SCHEMA_LOADING.md)
+- **Issues**: https://github.com/Surxe/OptionsConfig/issues
