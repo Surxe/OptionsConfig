@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test script for core.py functionality"""
+"""Test script for EnvBuilder functionality"""
 
 import sys
 from pathlib import Path

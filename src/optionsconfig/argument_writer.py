@@ -7,7 +7,7 @@ from typing import Literal, get_origin, get_args
 from pathlib import Path
 from loguru import logger
 
-from .core import get_schema
+from .schema import get_schema
 
 
 class ArgumentWriter:

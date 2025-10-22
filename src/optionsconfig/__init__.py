@@ -2,7 +2,7 @@
 OptionsConfig - Schema-driven configuration management for Python applications
 """
 
-from .core import get_schema
+from .schema import get_schema
 from .argument_writer import ArgumentWriter
 from .options import Options, init_options
 from .builders.env_builder import EnvBuilder

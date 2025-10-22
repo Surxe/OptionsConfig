@@ -22,7 +22,7 @@ from pathlib import Path
 repo_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(repo_root / "src"))
 
-from optionsconfig.core import get_schema
+from optionsconfig.schema import get_schema
 from optionsconfig.builders import EnvBuilder, ReadmeBuilder
 
 
