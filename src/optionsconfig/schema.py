@@ -91,6 +91,75 @@ def _load_schema_from_config() -> dict | None:
     return None
 
 
-def validate_schema(schema: dict) -> bool:
-    """Validate user's OPTIONS_SCHEMA follows required format."""
-    pass
+def load_schema() -> dict | None:
+    """
+    Load OPTIONS_SCHEMA from available sources without raising exceptions.
+    
+    Returns:
+        The OPTIONS_SCHEMA dictionary or None if not found
+    """
+    try:
+        return get_schema()
+    except ImportError:
+        return None
+
+
+def validate_schema(schema: dict) -> list[str]:
+    """
+    Validate user's OPTIONS_SCHEMA follows required format.
+    
+    Args:
+        schema: The OPTIONS_SCHEMA dictionary to validate
+    
+    Returns:
+        List of error messages (empty list if valid)
+    """
+    errors = []
+    
+    if not isinstance(schema, dict):
+        errors.append("Schema must be a dictionary")
+        return errors
+    
+    if not schema:
+        errors.append("Schema is empty")
+        return errors
+    
+    required_fields = ["env", "arg", "type", "default", "section", "help"]
+    
+    for option_name, details in schema.items():
+        if not isinstance(details, dict):
+            errors.append(f"{option_name}: Option definition must be a dictionary")
+            continue
+        
+        # Check required fields
+        for field in required_fields:
+            if field not in details:
+                errors.append(f"{option_name}: Missing required field '{field}'")
+        
+        # Validate env variable format
+        if "env" in details:
+            env = details["env"]
+            if not isinstance(env, str):
+                errors.append(f"{option_name}: 'env' must be a string")
+            elif not env.isupper():
+                errors.append(f"{option_name}: 'env' should be UPPER_CASE (got '{env}')")
+        
+        # Validate arg format
+        if "arg" in details:
+            arg = details["arg"]
+            if not isinstance(arg, str):
+                errors.append(f"{option_name}: 'arg' must be a string")
+            elif not arg.startswith("--"):
+                errors.append(f"{option_name}: 'arg' should start with '--' (got '{arg}')")
+        
+        # Validate depends_on
+        if "depends_on" in details:
+            depends_on = details["depends_on"]
+            if not isinstance(depends_on, list):
+                errors.append(f"{option_name}: 'depends_on' must be a list")
+            else:
+                for dep in depends_on:
+                    if dep not in schema:
+                        errors.append(f"{option_name}: depends on non-existent option '{dep}'")
+    
+    return errors
