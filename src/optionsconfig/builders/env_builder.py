@@ -11,20 +11,25 @@ import sys
 from pathlib import Path
 from typing import Dict, Any
 
+# Add parent directory to path to allow importing from src
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from optionsconfig.schema import get_schema
+
 class EnvBuilder:
     """Class to build .env.example from OPTIONS_SCHEMA."""
 
-    def __init__(self, schema: dict, env_example_path: str | Path | None = None):
+    def __init__(self, schema: dict | None = None, env_example_path: str | Path | None = None):
         """
         Initialize EnvBuilder.
         
         Args:
-            schema: The OPTIONS_SCHEMA dictionary
+            schema: The OPTIONS_SCHEMA dictionary. If None, loads from pyproject.toml configuration.
             env_example_path: Optional path to .env.example file.
                              If None, will check pyproject.toml or use default.
         """
         self.env_example_file = self._get_env_example_path(env_example_path)
-        self.schema = schema
+        self.schema = get_schema(schema)
 
     def build(self) -> bool:
         """Build the .env.example file."""

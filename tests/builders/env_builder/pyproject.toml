@@ -1,0 +1,2 @@
+[tool.optionsconfig]
+schema_module = "env_builder_schema"

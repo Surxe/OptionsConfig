@@ -12,20 +12,25 @@ import re
 from pathlib import Path
 from typing import Dict, Any
 
+# Add parent directory to path to allow importing from src
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from optionsconfig.schema import get_schema
+
 class ReadmeBuilder:
     """Class to build README option documentation from OPTIONS_SCHEMA."""
 
-    def __init__(self, schema: dict, readme_path: str | Path | None = None):
+    def __init__(self, schema: dict | None = None, readme_path: str | Path | None = None):
         """
         Initialize ReadmeBuilder.
         
         Args:
-            schema: The OPTIONS_SCHEMA dictionary
+            schema: The OPTIONS_SCHEMA dictionary. If None, loads from pyproject.toml configuration.
             readme_path: Optional path to README.md file.
                         If None, will check pyproject.toml or use default.
         """
         self.readme_file = self._get_readme_path(readme_path)
-        self.schema = schema
+        self.schema = get_schema(schema)
 
     def build(self) -> bool:
         """Build and update the README.md file with option documentation."""
