@@ -7,7 +7,7 @@ from pathlib import Path
 # Add src to path for local testing
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from optionsconfig.core import Options, ArgumentWriter, init_options
+from optionsconfig import Options, ArgumentWriter, init_options
 import argparse
 
 # Import the test schema from this directory

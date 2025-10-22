@@ -12,7 +12,7 @@ The `optionsconfig` package supports two methods for loading the `OPTIONS_SCHEMA
 Pass your schema directly to any class that needs it:
 
 ```python
-from optionsconfig.core import Options, ArgumentWriter
+from optionsconfig import Options, ArgumentWriter
 
 # Define your schema
 MY_SCHEMA = {
@@ -76,7 +76,7 @@ The module path should be:
 ### Step 3: Use without explicit schema
 
 ```python
-from optionsconfig.core import Options, ArgumentWriter
+from optionsconfig import Options, ArgumentWriter
 
 # Schema is automatically loaded from pyproject.toml
 options = Options()
@@ -160,7 +160,7 @@ schema_module = "options_schema"
 
 **main.py:**
 ```python
-from optionsconfig.core import Options
+from optionsconfig import Options
 options = Options()  # Automatically loads from options_schema.py
 ```
 
@@ -185,7 +185,7 @@ schema_module = "myapp.config.options_schema"
 
 **main.py:**
 ```python
-from optionsconfig.core import Options
+from optionsconfig import Options
 options = Options()  # Automatically loads from myapp/config/options_schema.py
 ```
 
@@ -193,7 +193,7 @@ options = Options()  # Automatically loads from myapp/config/options_schema.py
 
 ```python
 import pytest
-from optionsconfig.core import Options
+from optionsconfig import Options
 
 def test_custom_config():
     test_schema = {
