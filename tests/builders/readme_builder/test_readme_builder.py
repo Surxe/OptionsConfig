@@ -23,13 +23,19 @@ class TestReadmeBuilder(unittest.TestCase):
     
     def setUp(self):
         """Set up test file path."""
-        self.readme_path = Path('tests/builders/readme_builder/TEST_README.md')
+        self.test_dir = Path(__file__).parent
+        self.readme_path = self.test_dir / 'TEST_README.md'
+    
+    def tearDown(self):
+        """Clean up test files."""
+        if self.readme_path.exists():
+            self.readme_path.unlink()
     
     def test_build_readme(self):
         """Test that ReadmeBuilder generates correct README content."""
         # Copy mock README with markers
         import shutil
-        mock_readme_src = Path(__file__).parent / 'MOCK_README_WITH_MARKERS.md'
+        mock_readme_src = self.test_dir / 'MOCK_README_WITH_MARKERS.md'
         shutil.copy(mock_readme_src, self.readme_path)
         
         # Pass the schema directly and build
@@ -118,13 +124,9 @@ class TestReadmeBuilderWithToml(unittest.TestCase):
     
     def test_build_readme_toml_no_path_param(self):
         """Test that ReadmeBuilder raises error when markers are not present."""
-        # Change to test directory
-        os.chdir(self.test_dir)
-        
         # Create a temp subdirectory without readme_path in config
         temp_dir = self.test_dir / 'temp_test'
         temp_dir.mkdir(exist_ok=True)
-        os.chdir(temp_dir)
         
         # Copy the schema file to temp directory
         import shutil
@@ -132,17 +134,25 @@ class TestReadmeBuilderWithToml(unittest.TestCase):
         schema_dst = temp_dir / 'readme_builder_schema.py'
         shutil.copy(schema_src, schema_dst)
         
-        # Create a minimal pyproject.toml with only schema_module
+        # Create a minimal pyproject.toml with only schema_module and explicit readme_path
         temp_toml = temp_dir / 'pyproject.toml'
         with open(temp_toml, 'w') as f:
-            f.write('[tool.optionsconfig]\nschema_module = "readme_builder_schema"\n')
+            f.write('[tool.optionsconfig]\n')
+            f.write('schema_module = "readme_builder_schema"\n')
+            f.write('readme_path = "README.md"\n')  # Explicit path in temp dir
         
-        # Copy mock README without markers to default location
+        # Copy mock README without markers to temp directory
         mock_readme_src = self.test_dir / 'MOCK_README_NO_MARKERS.md'
         default_readme = temp_dir / 'README.md'
         shutil.copy(mock_readme_src, default_readme)
         
+        # Save current directory
+        original_cwd = os.getcwd()
+        
         try:
+            # Change to temp directory so ReadmeBuilder finds local pyproject.toml
+            os.chdir(temp_dir)
+            
             # Create builder - should raise ValueError when markers are missing
             builder = ReadmeBuilder()
             
@@ -155,8 +165,8 @@ class TestReadmeBuilderWithToml(unittest.TestCase):
             self.assertIn('END_GENERATED_OPTIONS', str(context.exception))
         
         finally:
-            # Clean up temp directory (mock README remains in test_dir)
-            os.chdir(self.original_cwd)
+            # Clean up temp directory
+            os.chdir(original_cwd)
             if temp_dir.exists():
                 shutil.rmtree(temp_dir)
     
