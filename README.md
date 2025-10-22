@@ -25,12 +25,16 @@ For Python < 3.11, also install TOML support:
 pip install optionsconfig[toml]
 ```
 
+After installation, the `optionsconfig` command will be available in your terminal.
+
 ## Quick Start
 
 ### 1. Define Your Schema
 
+Create an `options_schema.py` file in your project:
+
 ```python
-# config/schema.py
+# options_schema.py
 OPTIONS_SCHEMA = {
     "DEBUG": {
         "env": "DEBUG",
@@ -55,7 +59,7 @@ OPTIONS_SCHEMA = {
 
 ```toml
 [tool.optionsconfig]
-schema_module = "config.schema"
+schema_module = "options_schema"
 ```
 
 ### 3. Use in Your Application
@@ -69,6 +73,13 @@ options = Options()
 # Access configuration values
 if options.debug:
     print(f"API Key: {options.api_key}")
+```
+
+### 4. Generate Documentation
+
+```bash
+# Generate .env.example and update README.md
+optionsconfig build all
 ```
 
 ## Core Components
@@ -141,7 +152,31 @@ See [SCHEMA_LOADING.md](SCHEMA_LOADING.md) for detailed information on:
 
 ## Documentation Generation
 
-### .env.example
+### Command Line Interface
+
+After installing the package, use the `optionsconfig` command:
+
+```bash
+# Generate .env.example
+optionsconfig build env
+
+# Update README.md
+optionsconfig build readme
+
+# Generate all documentation
+optionsconfig build all
+
+# Validate your schema
+optionsconfig validate
+
+# Show schema information
+optionsconfig info
+optionsconfig info -v  # verbose output
+```
+
+### Programmatic API
+
+#### .env.example
 
 Place options between special markers in your `.env.example`:
 
@@ -151,9 +186,9 @@ Place options between special markers in your `.env.example`:
 # END_OPTIONS_CONFIG
 ```
 
-Run `EnvBuilder().build()` to populate the section.
+Run `EnvBuilder().build()` or use the CLI to populate the section.
 
-### README.md
+#### README.md
 
 Place options between special markers in your `README.md`:
 
@@ -162,7 +197,7 @@ Place options between special markers in your `README.md`:
 <!-- END_GENERATED_OPTIONS -->
 ```
 
-Run `ReadmeBuilder().build()` to populate the section.
+Run `ReadmeBuilder().build()` or use the CLI to populate the section.
 
 ## Testing
 
@@ -206,7 +241,26 @@ if __name__ == "__main__":
     main()
 ```
 
-### Generate All Documentation
+### Generate Documentation with CLI
+
+```bash
+# Validate your schema first
+optionsconfig validate
+
+# Generate .env.example
+optionsconfig build env
+
+# Update README.md with options documentation
+optionsconfig build readme
+
+# Or generate everything at once
+optionsconfig build all
+
+# View schema information
+optionsconfig info
+```
+
+### Generate Documentation Programmatically
 
 ```python
 # scripts/build_docs.py
