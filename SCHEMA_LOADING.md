@@ -31,16 +31,6 @@ options = Options(schema=MY_SCHEMA)
 writer = ArgumentWriter(schema=MY_SCHEMA)
 ```
 
-**Pros:**
-- Explicit and clear
-- No configuration needed
-- Works in any environment
-- Easy to test with different schemas
-
-**Cons:**
-- Requires importing and passing schema everywhere
-- More verbose
-
 ## Method 2: Configuration File (Recommended)
 
 Define the schema module path in your `pyproject.toml`:
@@ -83,16 +73,6 @@ options = Options()
 writer = ArgumentWriter()
 ```
 
-**Pros:**
-- Clean, simple code
-- Centralized configuration
-- Standard Python packaging approach
-- Can be committed to version control
-
-**Cons:**
-- Requires pyproject.toml in project root
-- Requires Python 3.11+ OR `tomli` package for Python < 3.11
-
 ## Installing tomli for Python < 3.11
 
 If you're using Python < 3.11, install the `tomli` package:
@@ -113,7 +93,7 @@ dependencies = [
 
 ## Common Module Paths
 
-Here are examples of valid `schema_module` values based on your project structure:
+Here are examples of valid `schema_module` values:
 
 | File Location | schema_module Value |
 |--------------|-------------------|
@@ -209,34 +189,4 @@ def test_custom_config():
     
     options = Options(schema=test_schema)
     assert options.test_var == "test"
-```
-
-## Best Practices
-
-1. **Use pyproject.toml for applications** - Cleaner code, standard approach
-2. **Use direct schema for libraries** - More flexible, no hidden dependencies
-3. **Keep schema in a dedicated file** - Don't mix schema with application logic
-4. **Use descriptive module names** - `options_schema` or `config.schema` are clear
-5. **Document your schema location** - Add a comment in your README
-
-## Migration from Environment Variables
-
-If you were previously using the `OPTIONS_SCHEMA_MODULE` environment variable approach, here's how to migrate:
-
-**Old approach:**
-```bash
-export OPTIONS_SCHEMA_MODULE=myapp.config.schema
-python main.py
-```
-
-**New approach:**
-Add to `pyproject.toml`:
-```toml
-[tool.optionsconfig]
-schema_module = "myapp.config.schema"
-```
-
-Then simply run:
-```bash
-python main.py
 ```
