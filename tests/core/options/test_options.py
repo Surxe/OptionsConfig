@@ -203,12 +203,22 @@ class TestOptions(unittest.TestCase):
         
         try:
             log_file = Path('tests/core/options/logs/test_sensitive.log')
+            # Delete old log file if it exists
+            if log_file.exists():
+                log_file.unlink()
+            
             options = Options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
             
             # API key should be set
             self.assertEqual(options.api_key, 'secret123')
             
+            # Force flush logs
+            import logging
+            for handler in logging.getLogger().handlers:
+                handler.flush()
+            
             # Check log file doesn't contain the actual key
+            self.assertTrue(log_file.exists(), "Log file was not created")
             with open(log_file, 'r') as f:
                 log_content = f.read()
                 self.assertNotIn('secret123', log_content)
