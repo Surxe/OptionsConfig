@@ -180,6 +180,8 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+.vscode/
+
 # Application
 .temp/
 
