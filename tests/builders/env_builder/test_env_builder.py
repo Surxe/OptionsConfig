@@ -23,7 +23,7 @@ class TestEnvBuilder(unittest.TestCase):
     
     def setUp(self):
         """Set up test file path."""
-        self.env_example_path = Path('tests/builders/env_builder/env.example')
+        self.env_example_path = Path('tests/builders/env_builder/.env.example')
     
     def test_build_env_example(self):
         """Test that EnvBuilder generates correct .env.example content."""
@@ -61,7 +61,6 @@ class TestEnvBuilderWithToml(unittest.TestCase):
         """Set up test environment and save current directory."""
         self.test_dir = Path(__file__).parent
         self.original_cwd = os.getcwd()
-        self.env_example_path = self.test_dir / 'env_toml.example'
         
         # Ensure the test directory has pyproject.toml
         self.toml_path = self.test_dir / 'pyproject.toml'
@@ -71,25 +70,30 @@ class TestEnvBuilderWithToml(unittest.TestCase):
     def tearDown(self):
         """Restore original directory and clean up test files."""
         os.chdir(self.original_cwd)
-        # Clean up generated test file
-        if self.env_example_path.exists():
-            self.env_example_path.unlink()
+        # Clean up generated test files
+        env_example = self.test_dir / '.env.example'
+        if env_example.exists():
+            env_example.unlink()
     
     def test_build_env_example_from_toml(self):
-        """Test that EnvBuilder loads schema from pyproject.toml and generates correct content."""
+        """Test that EnvBuilder loads schema and path from pyproject.toml and generates correct content."""
         # Change to test directory where pyproject.toml is located
         os.chdir(self.test_dir)
         
-        # Create EnvBuilder without passing schema - should load from pyproject.toml
-        builder = EnvBuilder(env_example_path=self.env_example_path)
+        # Create EnvBuilder without passing schema or path - should load both from pyproject.toml
+        builder = EnvBuilder()
         builder.build()
         
+        # The path should be loaded from pyproject.toml (.env.example)
+        env_example_path = self.test_dir / '.env.example'
+        
         # Verify file was created
-        self.assertTrue(self.env_example_path.exists(), 
-                       "env.example file was not created")
+        self.assertTrue(env_example_path.exists(), 
+                       ".env.example file was not created")
         
         # Read generated content
-        genned_content = self._read_env_file()
+        with open(env_example_path, 'r', encoding='utf-8') as f:
+            genned_content = f.read()
         
         # Verify expected content
         expected_lines = [
@@ -110,7 +114,7 @@ class TestEnvBuilderWithToml(unittest.TestCase):
                         "Generated .env.example content does not match expected content when loaded from toml")
     
     def test_build_env_example_toml_no_path_param(self):
-        """Test that EnvBuilder can generate with default path when only loading schema from toml."""
+        """Test that EnvBuilder uses default path when not specified in toml or parameters."""
         # Change to test directory
         os.chdir(self.test_dir)
         
@@ -124,7 +128,7 @@ class TestEnvBuilderWithToml(unittest.TestCase):
             
             # Verify file was created
             self.assertTrue(custom_path.exists(), 
-                           "env.example file was not created at custom path")
+                           ".env.example file was not created at custom path")
             
             # Verify content is correct
             with open(custom_path, 'r', encoding='utf-8') as f:
@@ -143,10 +147,10 @@ class TestEnvBuilderWithToml(unittest.TestCase):
         """Test that schema loaded from toml produces identical output to direct parameter."""
         os.chdir(self.test_dir)
         
-        # Build with toml
-        toml_path = self.test_dir / 'env_toml_test.example'
-        builder_toml = EnvBuilder(env_example_path=toml_path)
+        # Build with toml (no parameters at all)
+        builder_toml = EnvBuilder()
         builder_toml.build()
+        toml_path = self.test_dir / '.env.example'
         
         # Build with direct parameter
         direct_path = self.test_dir / 'env_direct_test.example'
@@ -166,14 +170,13 @@ class TestEnvBuilderWithToml(unittest.TestCase):
         
         finally:
             # Clean up
-            if toml_path.exists():
-                toml_path.unlink()
             if direct_path.exists():
                 direct_path.unlink()
     
     def _read_env_file(self):
         """Read generated .env.example file."""
-        with open(self.env_example_path, 'r', encoding='utf-8') as f:
+        env_path = self.test_dir / '.env.example'
+        with open(env_path, 'r', encoding='utf-8') as f:
             return f.read()
 
 
