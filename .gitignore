@@ -197,3 +197,6 @@ tests/builders/env_builder/*.env.example
 tests/builders/readme_builder/TEST*.md
 tests/builders/integration/*.env.example
 tests/builders/integration/*_README.md
+
+# Personal
+todo.md
