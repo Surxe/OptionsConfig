@@ -37,6 +37,10 @@ toml = [
 # If not set, defaults to repository root
 # readme_path = "README.md"
 
+# Optional: Specify custom path for log file
+# If not set, defaults to src/optionsconfig/logs/default.log
+# log_file = "logs/app.log"
+
 [project.urls]
 Homepage = "https://github.com/yourusername/OptionsConfig"
 Repository = "https://github.com/yourusername/OptionsConfig"

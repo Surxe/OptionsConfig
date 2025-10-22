@@ -186,6 +186,10 @@ cython_debug/
 # Generated documentation files (library package, not needed in repo)
 .env.example
 
+# Logs
+src/optionsconfig/logs/
+tests/**/logs/
+
 # Temp output for tests
 tests/builders/env_builder/*.env.example
 tests/builders/readme_builder/*.md

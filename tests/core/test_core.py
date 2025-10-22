@@ -13,11 +13,14 @@ import argparse
 # Import the test schema from this directory
 from options_schema import OPTIONS_SCHEMA
 
+# Test log file
+TEST_LOG_FILE = Path('tests/core/logs/test_core.log')
+
 def test_basic_options():
     print("=" * 60)
     print("Test 1: Basic Options (no args)")
     print("=" * 60)
-    options = Options(schema=OPTIONS_SCHEMA)
+    options = Options(schema=OPTIONS_SCHEMA, log_file=TEST_LOG_FILE)
     print()
 
 def test_with_args():
@@ -30,14 +33,14 @@ def test_with_args():
     
     # Simulate command line args
     args = parser.parse_args(['--should-parse', '--game-to-parse', 'TestGame'])
-    options = Options(args, schema=OPTIONS_SCHEMA)
+    options = Options(args, schema=OPTIONS_SCHEMA, log_file=TEST_LOG_FILE)
     print()
 
 def test_init_options():
     print("=" * 60)
     print("Test 3: Using init_options()")
     print("=" * 60)
-    options = init_options(schema=OPTIONS_SCHEMA)
+    options = init_options(schema=OPTIONS_SCHEMA, log_file=TEST_LOG_FILE)
     print(f"Options initialized: {type(options)}")
     print()
 
