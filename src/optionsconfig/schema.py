@@ -46,11 +46,13 @@ def get_schema(schema: dict | None = None) -> dict:
     """
     # 1. Direct schema dict
     if schema is not None:
+        validate_schema(schema)
         return schema
     
     # 2. Configuration file (pyproject.toml)
     config_schema = _load_schema_from_config()
     if config_schema:
+        validate_schema(config_schema)
         return config_schema
     
     raise ImportError(
