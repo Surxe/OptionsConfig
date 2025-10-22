@@ -17,7 +17,7 @@ from pathlib import Path
 import argparse
 
 # Add paths - src first so optionsconfig imports work, then local for our schemas
-src_path = str(Path(__file__).parent.parent.parent.parent / "src")
+src_path = str(Path(__file__).parent.parent.parent / "src")
 local_path = str(Path(__file__).parent)
 if src_path not in sys.path:
     sys.path.insert(0, src_path)

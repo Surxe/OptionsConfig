@@ -20,7 +20,7 @@ import argparse
 from pathlib import Path
 
 # Add paths - src first so optionsconfig imports work, then local for our schemas
-src_path = str(Path(__file__).parent.parent.parent.parent / "src")
+src_path = str(Path(__file__).parent.parent.parent / "src")
 local_path = str(Path(__file__).parent)
 if src_path not in sys.path:
     sys.path.insert(0, src_path)
@@ -38,7 +38,7 @@ class TestOptions(unittest.TestCase):
     
     def test_basic_initialization(self):
         """Test basic Options initialization with schema only."""
-        log_file = Path('tests/core/options/logs/test_basic.log')
+        log_file = Path('tests/options/logs/test_basic.log')
         options = Options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
         
         # Verify attributes were set
@@ -54,7 +54,7 @@ class TestOptions(unittest.TestCase):
     
     def test_log_file_parameter(self):
         """Test log file parameter handling."""
-        log_file = Path('tests/core/options/logs/custom_log.log')
+        log_file = Path('tests/options/logs/custom_log.log')
         options = Options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
         
         # Verify log_file was set correctly
@@ -79,7 +79,7 @@ class TestOptions(unittest.TestCase):
             '--max-retries', '10'
         ])
         
-        log_file = Path('tests/core/options/logs/test_args.log')
+        log_file = Path('tests/options/logs/test_args.log')
         options = Options(args=args, schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
         
         # Verify args override defaults
@@ -98,7 +98,7 @@ class TestOptions(unittest.TestCase):
         os.environ['LOG_LEVEL'] = 'DEBUG'
         
         try:
-            log_file = Path('tests/core/options/logs/test_env.log')
+            log_file = Path('tests/options/logs/test_env.log')
             options = Options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
             
             # Verify env vars were used
@@ -124,7 +124,7 @@ class TestOptions(unittest.TestCase):
             writer.add_arguments(parser)
             args = parser.parse_args(['--project-name', 'ArgsProject'])
             
-            log_file = Path('tests/core/options/logs/test_priority.log')
+            log_file = Path('tests/options/logs/test_priority.log')
             options = Options(args=args, schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
             
             # Args should win
@@ -145,7 +145,7 @@ class TestOptions(unittest.TestCase):
             '--output-file', 'output.txt'
         ])
         
-        log_file = Path('tests/core/options/logs/test_dep_success.log')
+        log_file = Path('tests/options/logs/test_dep_success.log')
         options = Options(args=args, schema=OPTIONS_SCHEMA_WITH_DEPS, log_file=log_file)
         
         self.assertTrue(options.enable_processing)
@@ -161,7 +161,7 @@ class TestOptions(unittest.TestCase):
         # Enable processing but DON'T provide required output file
         args = parser.parse_args(['--enable-processing'])
         
-        log_file = Path('tests/core/options/logs/test_dep_fail.log')
+        log_file = Path('tests/options/logs/test_dep_fail.log')
         
         with self.assertRaises(ValueError) as cm:
             options = Options(args=args, schema=OPTIONS_SCHEMA_WITH_DEPS, log_file=log_file)
@@ -172,7 +172,7 @@ class TestOptions(unittest.TestCase):
     def test_root_option_auto_default(self):
         """Test root options auto-default to True when not explicitly set."""
         # Don't set enable_processing at all (uses schema with dependencies)
-        log_file = Path('tests/core/options/logs/test_auto_default.log')
+        log_file = Path('tests/options/logs/test_auto_default.log')
         
         # When root option is auto-defaulted to True, dependent option is required
         # This should fail validation
@@ -187,7 +187,7 @@ class TestOptions(unittest.TestCase):
         os.environ['ENABLE_PROCESSING'] = 'false'
         
         try:
-            log_file = Path('tests/core/options/logs/test_explicit_false.log')
+            log_file = Path('tests/options/logs/test_explicit_false.log')
             options = Options(schema=OPTIONS_SCHEMA_WITH_DEPS, log_file=log_file)
             
             # Should respect explicit False and not require dependent option
@@ -202,7 +202,7 @@ class TestOptions(unittest.TestCase):
         os.environ['API_KEY'] = 'secret123'
         
         try:
-            log_file = Path('tests/core/options/logs/test_sensitive.log')
+            log_file = Path('tests/options/logs/test_sensitive.log')
             # Delete old log file if it exists
             if log_file.exists():
                 log_file.unlink()
@@ -234,7 +234,7 @@ class TestOptions(unittest.TestCase):
         os.environ['LOG_LEVEL'] = 'ERROR'
         
         try:
-            log_file = Path('tests/core/options/logs/test_types.log')
+            log_file = Path('tests/options/logs/test_types.log')
             options = Options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
             
             # Verify types
@@ -258,7 +258,7 @@ class TestOptions(unittest.TestCase):
         os.environ['LOG_LEVEL'] = 'WARNING'
         
         try:
-            log_file = Path('tests/core/options/logs/test_literal.log')
+            log_file = Path('tests/options/logs/test_literal.log')
             options = Options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
             
             self.assertEqual(options.log_level, 'WARNING')
@@ -270,7 +270,7 @@ class TestOptions(unittest.TestCase):
         os.environ['LOG_LEVEL'] = 'INVALID'
         
         try:
-            log_file = Path('tests/core/options/logs/test_literal_invalid.log')
+            log_file = Path('tests/options/logs/test_literal_invalid.log')
             options = Options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
             
             # Should fall back to default
@@ -281,7 +281,7 @@ class TestOptions(unittest.TestCase):
     
     def test_init_options_helper(self):
         """Test init_options() helper function."""
-        log_file = Path('tests/core/options/logs/test_init_helper.log')
+        log_file = Path('tests/options/logs/test_init_helper.log')
         options = init_options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
         
         self.assertIsInstance(options, Options)
@@ -290,7 +290,7 @@ class TestOptions(unittest.TestCase):
     
     def test_schema_attributes(self):
         """Test all schema options become attributes."""
-        log_file = Path('tests/core/options/logs/test_attributes.log')
+        log_file = Path('tests/options/logs/test_attributes.log')
         options = Options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file)
         
         # Check all schema keys become lowercase attributes
