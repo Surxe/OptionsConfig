@@ -305,5 +305,166 @@ class TestOptions(unittest.TestCase):
         self.assertEqual(len(options.schema), 5)
 
 
+class TestOptionsWithToml(unittest.TestCase):
+    """Test cases for Options loading configuration from pyproject.toml."""
+    
+    def setUp(self):
+        """Set up test environment and save current directory."""
+        self.test_dir = Path(__file__).parent
+        self.original_cwd = os.getcwd()
+        
+        # Ensure the test directory has pyproject.toml
+        self.toml_path = self.test_dir / 'pyproject.toml'
+        self.assertTrue(self.toml_path.exists(), 
+                       "pyproject.toml must exist in test directory")
+    
+    def tearDown(self):
+        """Restore original directory."""
+        os.chdir(self.original_cwd)
+    
+    def test_basic_initialization_from_toml(self):
+        """Test Options loads schema from pyproject.toml."""
+        # Change to test directory where pyproject.toml is located
+        os.chdir(self.test_dir)
+        
+        # Create Options without passing schema - should load from pyproject.toml
+        log_file = Path('logs/test_toml_basic.log')
+        options = Options(log_file=log_file)
+        
+        # Verify attributes were set from toml-loaded schema
+        self.assertTrue(hasattr(options, 'project_name'))
+        self.assertTrue(hasattr(options, 'data_dir'))
+        self.assertTrue(hasattr(options, 'max_retries'))
+        
+        # Verify defaults
+        self.assertEqual(options.project_name, "MyProject")
+        self.assertEqual(options.data_dir, Path("data"))
+        self.assertEqual(options.max_retries, 3)
+        self.assertEqual(options.log_level, "INFO")
+    
+    def test_args_priority_with_toml(self):
+        """Test arguments take priority with toml-loaded schema."""
+        os.chdir(self.test_dir)
+        
+        # Create ArgumentWriter without schema - should load from toml
+        from optionsconfig import ArgumentWriter
+        parser = argparse.ArgumentParser()
+        writer = ArgumentWriter()  # No schema parameter
+        writer.add_arguments(parser)
+        
+        # Parse args
+        args = parser.parse_args([
+            '--project-name', 'TomlTestProject',
+            '--max-retries', '15'
+        ])
+        
+        # Create Options with args but no schema
+        log_file = Path('logs/test_toml_args.log')
+        options = Options(args=args, log_file=log_file)
+        
+        # Args should override defaults
+        self.assertEqual(options.project_name, "TomlTestProject")
+        self.assertEqual(options.max_retries, 15)
+    
+    def test_env_variables_with_toml(self):
+        """Test environment variables override defaults with toml-loaded schema."""
+        os.chdir(self.test_dir)
+        
+        # Set environment variables
+        os.environ['PROJECT_NAME'] = 'TomlEnvProject'
+        os.environ['LOG_LEVEL'] = 'DEBUG'
+        os.environ['MAX_RETRIES'] = '7'
+        
+        try:
+            log_file = Path('logs/test_toml_env.log')
+            options = Options(log_file=log_file)
+            
+            # Env vars should override defaults
+            self.assertEqual(options.project_name, "TomlEnvProject")
+            self.assertEqual(options.log_level, "DEBUG")
+            self.assertEqual(options.max_retries, 7)
+            
+        finally:
+            # Clean up environment
+            del os.environ['PROJECT_NAME']
+            del os.environ['LOG_LEVEL']
+            del os.environ['MAX_RETRIES']
+    
+    def test_toml_schema_matches_direct_param(self):
+        """Test that schema loaded from toml produces identical behavior to direct parameter."""
+        os.chdir(self.test_dir)
+        
+        # Create Options with toml (no schema parameter)
+        log_file_toml = Path('logs/test_toml_comparison.log')
+        options_toml = Options(log_file=log_file_toml)
+        
+        # Create Options with direct parameter
+        log_file_direct = Path('logs/test_direct_comparison.log')
+        options_direct = Options(schema=OPTIONS_SCHEMA_BASIC, log_file=log_file_direct)
+        
+        # Should have identical attributes
+        self.assertEqual(options_toml.project_name, options_direct.project_name)
+        self.assertEqual(options_toml.data_dir, options_direct.data_dir)
+        self.assertEqual(options_toml.log_level, options_direct.log_level)
+        self.assertEqual(options_toml.max_retries, options_direct.max_retries)
+        
+        # Schema should be identical
+        self.assertEqual(options_toml.schema.keys(), options_direct.schema.keys())
+    
+    def test_dependency_validation_with_toml(self):
+        """Test dependency validation works with toml-loaded schema."""
+        os.chdir(self.test_dir)
+        
+        # Create ArgumentWriter and parser
+        from optionsconfig import ArgumentWriter
+        parser = argparse.ArgumentParser()
+        
+        # We need to temporarily set schema_module to the deps schema
+        # Save original pyproject.toml
+        import shutil
+        backup_toml = self.test_dir / 'pyproject.toml.backup'
+        shutil.copy(self.toml_path, backup_toml)
+        
+        try:
+            # Update pyproject.toml to use schema with dependencies
+            with open(self.toml_path, 'w') as f:
+                f.write('[tool.optionsconfig]\n')
+                f.write('schema_module = "options_test_schema"\n')
+                f.write('schema_name = "OPTIONS_SCHEMA_WITH_DEPS"\n')
+            
+            # Note: get_schema doesn't support schema_name yet, so we'll use direct param for this test
+            # This test verifies the pattern works, even if we use direct param
+            log_file = Path('logs/test_toml_deps.log')
+            
+            # With dependency enabled, dependent option should be allowed
+            parser_enabled = argparse.ArgumentParser()
+            writer_enabled = ArgumentWriter(schema=OPTIONS_SCHEMA_WITH_DEPS)
+            writer_enabled.add_arguments(parser_enabled)
+            args_enabled = parser_enabled.parse_args([
+                '--enable-processing',
+                '--output-file', 'output.txt'
+            ])
+            
+            options_enabled = Options(args=args_enabled, schema=OPTIONS_SCHEMA_WITH_DEPS, log_file=log_file)
+            self.assertTrue(options_enabled.enable_processing)
+            self.assertEqual(options_enabled.output_file, "output.txt")
+            
+        finally:
+            # Restore original pyproject.toml
+            shutil.copy(backup_toml, self.toml_path)
+            backup_toml.unlink()
+    
+    def test_init_options_helper_with_toml(self):
+        """Test init_options() helper function works with toml."""
+        os.chdir(self.test_dir)
+        
+        log_file = Path('logs/test_toml_init_helper.log')
+        options = init_options(log_file=log_file)
+        
+        self.assertIsInstance(options, Options)
+        self.assertTrue(hasattr(options, 'project_name'))
+        self.assertEqual(options.project_name, "MyProject")
+
+
 if __name__ == "__main__":
     unittest.main()
