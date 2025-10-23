@@ -12,14 +12,25 @@ from loguru import logger
 
 from .schema import get_schema
 
-load_dotenv()
-
 
 class Options:
     """
     A class to hold options for the application.
     """
     def __init__(self, args: Namespace | None = None, schema: dict | None = None, log_file: str | Path | None = None):
+        # Load .env from current working directory (user's project root)
+        # This must be called here (not at module level) to ensure it loads from the
+        # user's project directory, not from where OptionsConfig is installed
+        cwd = Path.cwd()
+        env_file = cwd / ".env"
+        
+        # Explicitly load .env file if it exists
+        if env_file.exists():
+            load_dotenv(dotenv_path=env_file, override=True)
+            logger.debug(f"Loaded .env from: {env_file}")
+        else:
+            logger.debug(f".env not found at: {env_file}")
+        
         self.schema = get_schema(schema=schema)
         self.log_file = self._get_log_file(log_file)
 

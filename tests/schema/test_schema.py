@@ -240,10 +240,8 @@ class TestSchemaWithToml(unittest.TestCase):
                 f.write('[tool.optionsconfig]\n')
                 f.write('schema_module = "nonexistent_module_12345"\n')
             
-            result = _load_schema_from_config()
-            
-            # Should return None when module can't be imported
-            self.assertIsNone(result)
+            with self.assertRaises(ImportError):
+                _load_schema_from_config()
             
         finally:
             os.chdir(original_dir)

@@ -8,7 +8,7 @@ OPTIONS_SCHEMA format:
 * **default** - Default value. None means its required if any depends_on option is True
 * **help** - Description text
 * **section** - Logical grouping name
-* **depends_on** - Optional. List of option names this option depends on (required when ANY of those options is True)
+* **depends_on** - Optional. List of option names this option depends on (required when ANY of those options are True)
 * **sensitive** - Boolean flag for password masking
 """
 
