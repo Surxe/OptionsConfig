@@ -195,6 +195,7 @@ cython_debug/
 # Logs
 src/optionsconfig/logs/
 tests/**/logs/
+!example/expected_default.log
 
 # Temp output for tests
 tests/builders/env_builder/*.env.example

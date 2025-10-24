@@ -1,0 +1,3 @@
+2025-10-23 21:18:03.695 | INFO     | optionsconfig.options:log:260 - Options initialized with:
+ENABLE_FEATURE: True
+FEATURE_PATH: D:/Programs/Git/path/to/config
