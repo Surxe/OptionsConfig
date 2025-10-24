@@ -187,15 +187,14 @@ cython_debug/
 
 # Generated documentation files (library package, not needed in repo)
 .env.example
-# exclude example/.env.example from the filter
+
+# Example files
 !example/.env.example
-
-
+!example/expected_default.log
 
 # Logs
 src/optionsconfig/logs/
 tests/**/logs/
-!example/expected_default.log
 
 # Temp output for tests
 tests/builders/env_builder/*.env.example
