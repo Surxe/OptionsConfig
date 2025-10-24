@@ -13,11 +13,83 @@ from loguru import logger
 from .schema import get_schema
 
 
+def setup_logging(log_file: str | Path | None = None, log_level: str = "DEBUG") -> Path:
+    """
+    Setup loguru logging to the specified log file.
+    
+    Args:
+        log_file: Path to log file. If None, uses default location.
+        log_level: Logging level (default: DEBUG)
+        
+    Returns:
+        Path to the log file being used
+    """
+    # Determine log file path
+    if log_file is not None:
+        log_path = Path(log_file)
+    else:
+        # Try to load from config
+        config_path = _load_log_file_from_config()
+        if config_path:
+            log_path = config_path
+        else:
+            # Default location
+            default_dir = Path(__file__).parent / 'logs'
+            log_path = default_dir / 'default.log'
+    
+    # Ensure parent directory exists
+    os.makedirs(log_path.parent, exist_ok=True)
+    
+    # Remove existing handlers
+    logger.remove()
+    
+    # Clear the log file before adding the handler
+    with open(log_path, 'w') as f:
+        pass
+    
+    # Add handlers
+    logger.add(str(log_path), level=log_level, rotation="30 MB", retention="10 days", enqueue=True)
+    logger.add(sys.stdout, level=log_level)
+    
+    logger.debug(f"Logging initialized to: {log_path}")
+    
+    return log_path
+
+
+def _load_log_file_from_config() -> Path | None:
+    """Load log file path from pyproject.toml."""
+    try:
+        import tomllib
+    except ImportError:
+        try:
+            import tomli as tomllib
+        except ImportError:
+            # Python < 3.11 and tomli not installed, skip this method
+            return None
+    
+    config_file = Path('pyproject.toml')
+    if not config_file.exists():
+        return None
+    
+    try:
+        with open(config_file, 'rb') as f:
+            config = tomllib.load(f)
+        
+        log_file_path = config.get('tool', {}).get('optionsconfig', {}).get('log_file')
+        if log_file_path:
+            return Path(log_file_path)
+    except Exception:
+        # If any error occurs reading config, return None
+        pass
+    
+    return None
+
+
 class Options:
     """
     A class to hold options for the application.
     """
-    def __init__(self, args: Namespace | None = None, schema: dict | None = None, log_file: str | Path | None = None):
+    def __init__(self, args: Namespace | None = None, schema: dict | None = None, log_file: str | Path | None = None, setup_logger: bool = True):
         # Load .env from current working directory (user's project root)
         # This must be called here (not at module level) to ensure it loads from the
         # user's project directory, not from where OptionsConfig is installed
@@ -32,7 +104,12 @@ class Options:
             logger.debug(f".env not found at: {env_file}")
         
         self.schema = get_schema(schema=schema)
-        self.log_file = self._get_log_file(log_file)
+        
+        # Setup logging if requested
+        if setup_logger:
+            self.log_file = setup_logging(log_file=log_file, log_level=getattr(self, 'log_level', 'DEBUG'))
+        else:
+            self.log_file = Path(log_file) if log_file else None
 
         # Initialize all options in the following preference
         # 1. Direct args (if provided)
@@ -68,89 +145,8 @@ class Options:
             logger.debug(f"Set attribute {attr_name} to value: {value if not details.get('sensitive', False) else '***HIDDEN***'}")
 
         self.validate()
-
-        # Setup loguru logging
-        self._setup_logging()
         
         self.log()
-
-    def _get_log_file(self, log_file: str | Path | None = None) -> Path:
-        """
-        Get the log file path.
-        
-        Priority order:
-        1. Direct log_file parameter
-        2. Configuration file (pyproject.toml)
-        3. Default location (src/optionsconfig/logs/default.log or based on export_dir)
-        
-        Args:
-            log_file: Optional direct path to log file
-            
-        Returns:
-            Path to log file
-        """
-        # 1. Direct path parameter
-        if log_file is not None:
-            return Path(log_file)
-        
-        # 2. Configuration file (pyproject.toml)
-        config_path = self._load_log_file_from_config()
-        if config_path:
-            return config_path
-        
-        # 3. Default location - determine filename based on export_dir if available
-        default_dir = Path(__file__).parent / 'logs'
-        
-        # Try to use export_dir for filename if it exists in schema
-        if 'EXPORT_DIR' in self.schema and hasattr(self, 'export_dir') and self.export_dir:
-            log_filename = str(self.export_dir).replace('\\', '/').rstrip('/').split('/')[-1] + '.log'
-        else:
-            log_filename = 'default.log'
-        
-        return default_dir / log_filename
-    
-    def _load_log_file_from_config(self) -> Path | None:
-        """Load log file path from pyproject.toml."""
-        try:
-            import tomllib
-        except ImportError:
-            try:
-                import tomli as tomllib
-            except ImportError:
-                # Python < 3.11 and tomli not installed, skip this method
-                return None
-        
-        config_file = Path('pyproject.toml')
-        if not config_file.exists():
-            return None
-        
-        try:
-            with open(config_file, 'rb') as f:
-                config = tomllib.load(f)
-            
-            log_file_path = config.get('tool', {}).get('optionsconfig', {}).get('log_file')
-            if log_file_path:
-                return Path(log_file_path)
-        except Exception:
-            # If any error occurs reading config, return None
-            pass
-        
-        return None
-
-    def _setup_logging(self) -> None:
-        """Setup loguru logging to the configured log file."""
-        # Ensure parent directory exists
-        os.makedirs(self.log_file.parent, exist_ok=True)
-        
-        logger.remove()
-        
-        # Clear the log file before adding the handler
-        with open(self.log_file, 'w') as f:
-            pass
-        
-        my_log_level = getattr(self, 'log_level', 'DEBUG')
-        logger.add(str(self.log_file), level=my_log_level, rotation="30 MB", retention="10 days", enqueue=True)
-        logger.add(sys.stdout, level=my_log_level)
 
     def _process_schema(self, schema: dict, args_dict: dict) -> dict:
         """Process the option schema, env options, and args to get the combined options."""
@@ -261,9 +257,9 @@ class Options:
 
 
 # Helper to initialize OPTIONS with direct args if available
-def init_options(args: Namespace | None = None, schema: dict | None = None, log_file: str | Path | None = None) -> Options:
+def init_options(args: Namespace | None = None, schema: dict | None = None, log_file: str | Path | None = None, setup_logger: bool = True) -> Options:
     global OPTIONS
-    OPTIONS = Options(args=args, schema=schema, log_file=log_file)
+    OPTIONS = Options(args=args, schema=schema, log_file=log_file, setup_logger=setup_logger)
     return OPTIONS
 
 
