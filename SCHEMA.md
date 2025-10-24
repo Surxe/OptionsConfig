@@ -21,20 +21,6 @@ OPTIONS_SCHEMA = {
 }
 ```
 
-### Required Fields
-
-- **env**: Environment variable name (must be UPPER_CASE)
-- **arg**: Command-line argument (must start with `--`, use kebab-case)
-- **type**: Python type (`bool`, `str`, `int`, `float`, `Path`, `Literal[...]`)
-- **default**: Default value (use `None` for conditionally required options)
-- **section**: Section name for grouping in documentation
-- **help**: Description text shown in `--help` and generated docs
-
-### Optional Fields
-
-- **depends_on**: List of option names. If ANY listed option is `True`, this option becomes required (must not be `None`)
-- **sensitive**: Boolean flag. When `True`, value is masked as `***HIDDEN***` in logs
-
 ## Validation Rules
 
 The schema validator checks:
