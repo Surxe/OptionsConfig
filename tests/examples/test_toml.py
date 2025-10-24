@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 import shutil
 import os
+import re
 
 
 class TestTomlExample(unittest.TestCase):
@@ -23,9 +24,17 @@ class TestTomlExample(unittest.TestCase):
         # Create test directory
         cls.test_dir.mkdir(parents=True, exist_ok=True)
         
-        # Copy example files to test directory
+        # Find all expected files
+        cls.expected_files = {}
+        for expected_file in cls.example_dir.glob("expected_*"):
+            if expected_file.is_file():
+                # Map expected_filename -> actual_filename
+                actual_name = expected_file.name.replace("expected_", "", 1)
+                cls.expected_files[actual_name] = expected_file
+        
+        # Copy example files to test directory (excluding expected_ files)
         for item in cls.example_dir.iterdir():
-            if item.name == "__pycache__":
+            if item.name.startswith("expected_") or item.name == "__pycache__":
                 continue
             if item.is_file():
                 shutil.copy2(item, cls.test_dir / item.name)
@@ -85,14 +94,22 @@ class TestTomlExample(unittest.TestCase):
         env_example_path = self.test_dir / ".env.example"
         self.assertTrue(env_example_path.exists(), ".env.example not generated")
         
-        # Verify content has expected structure
-        with open(env_example_path, 'r') as f:
-            content = f.read()
-        
-        self.assertIn("ENABLE_FEATURE", content)
-        self.assertIn("FEATURE_PATH", content)
-        self.assertIn("Features", content)
-        self.assertIn("Enable the special feature", content)
+        # If expected file exists, compare against it
+        if ".env.example" in self.expected_files:
+            with open(env_example_path, 'r') as f:
+                generated = f.read()
+            with open(self.expected_files[".env.example"], 'r') as f:
+                expected = f.read()
+            self.assertEqual(generated, expected, ".env.example content doesn't match expected")
+        else:
+            # Otherwise, verify content has expected structure
+            with open(env_example_path, 'r') as f:
+                content = f.read()
+            
+            self.assertIn("ENABLE_FEATURE", content)
+            self.assertIn("FEATURE_PATH", content)
+            self.assertIn("Features", content)
+            self.assertIn("Enable the special feature", content)
     
     def test_build_docs_generates_readme(self):
         """Test that build_docs.py generates README.md using pyproject.toml"""
@@ -110,15 +127,24 @@ class TestTomlExample(unittest.TestCase):
         readme_path = self.test_dir / "README.md"
         self.assertTrue(readme_path.exists(), "README.md not found")
         
-        # Verify content has expected structure
-        with open(readme_path, 'r') as f:
-            content = f.read()
-        
-        self.assertIn("ENABLE_FEATURE", content)
-        self.assertIn("FEATURE_PATH", content)
-        self.assertIn("--enable-feature", content)
-        self.assertIn("--feature-path", content)
-        self.assertIn("Depends on: `ENABLE_FEATURE`", content)
+        # If expected file exists, compare against it
+        if "README.md" in self.expected_files:
+            with open(readme_path, 'r') as f:
+                generated = f.read()
+            with open(self.expected_files["README.md"], 'r') as f:
+                expected = f.read()
+            # Normalize line endings and trailing whitespace
+            self.assertEqual(generated.rstrip(), expected.rstrip(), "README.md content doesn't match expected")
+        else:
+            # Otherwise, verify content has expected structure
+            with open(readme_path, 'r') as f:
+                content = f.read()
+            
+            self.assertIn("ENABLE_FEATURE", content)
+            self.assertIn("FEATURE_PATH", content)
+            self.assertIn("--enable-feature", content)
+            self.assertIn("--feature-path", content)
+            self.assertIn("Depends on: `ENABLE_FEATURE`", content)
     
     def test_run_with_enable_feature_uses_pyproject_config(self):
         """Test that run.py --enable-feature loads schema from pyproject.toml"""
@@ -136,17 +162,47 @@ class TestTomlExample(unittest.TestCase):
         log_path = self.test_dir / "default.log"
         self.assertTrue(log_path.exists(), "default.log not generated")
         
-        # Verify log contains expected operations
-        with open(log_path, 'r') as f:
-            log_content = f.read()
-        
-        self.assertIn("Logging initialized to:", log_content)
-        self.assertIn("Added boolean argument --enable-feature", log_content)
-        self.assertIn("Added argument --feature-path", log_content)
-        self.assertIn("Options initialized with:", log_content)
-        self.assertIn("ENABLE_FEATURE: True", log_content)
-        self.assertIn("FEATURE_PATH:", log_content)
-        self.assertIn("Example Retrieval of enable_feature: True", log_content)
+        # If expected log file exists, compare against it
+        if "default.log" in self.expected_files:
+            with open(log_path, 'r') as f:
+                generated_lines = f.readlines()
+            with open(self.expected_files["default.log"], 'r') as f:
+                expected_lines = f.readlines()
+            
+            # Compare line by line, ignoring timestamps and file paths
+            self.assertEqual(len(generated_lines), len(expected_lines), 
+                           f"Log line count mismatch. Expected {len(expected_lines)}, got {len(generated_lines)}")
+            
+            for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines)):
+                gen_parts = gen_line.split(' | ', 2)
+                exp_parts = exp_line.split(' | ', 2)
+                
+                if len(gen_parts) >= 3 and len(exp_parts) >= 3:
+                    gen_level = gen_parts[0].strip()
+                    exp_level = exp_parts[0].strip()
+                    gen_msg = gen_parts[2].strip()
+                    exp_msg = exp_parts[2].strip()
+                    
+                    self.assertEqual(gen_level, exp_level, f"Line {i+1}: Log level mismatch")
+                    
+                    # For path-containing messages, just check message type
+                    if "Loaded .env from:" in gen_msg or "Logging initialized to:" in gen_msg:
+                        self.assertTrue(gen_msg.startswith(exp_msg.split(':')[0]), 
+                                      f"Line {i+1}: Message type mismatch")
+                    else:
+                        self.assertEqual(gen_msg, exp_msg, f"Line {i+1}: Message mismatch")
+        else:
+            # Otherwise, verify log contains expected operations
+            with open(log_path, 'r') as f:
+                log_content = f.read()
+            
+            self.assertIn("Logging initialized to:", log_content)
+            self.assertIn("Added boolean argument --enable-feature", log_content)
+            self.assertIn("Added argument --feature-path", log_content)
+            self.assertIn("Options initialized with:", log_content)
+            self.assertIn("ENABLE_FEATURE: True", log_content)
+            self.assertIn("FEATURE_PATH:", log_content)
+            self.assertIn("Example Retrieval of enable_feature: True", log_content)
     
     def test_run_help_displays_arguments(self):
         """Test that run.py --help displays the schema arguments loaded from pyproject.toml"""

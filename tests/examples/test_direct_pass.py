@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 import shutil
 import os
+import re
 
 
 class TestDirectPassExample(unittest.TestCase):
@@ -23,7 +24,15 @@ class TestDirectPassExample(unittest.TestCase):
         # Create test directory
         cls.test_dir.mkdir(parents=True, exist_ok=True)
         
-        # Copy example files to test directory
+        # Find all expected files
+        cls.expected_files = {}
+        for expected_file in cls.example_dir.glob("expected_*"):
+            if expected_file.is_file():
+                # Map expected_filename -> actual_filename
+                actual_name = expected_file.name.replace("expected_", "", 1)
+                cls.expected_files[actual_name] = expected_file
+        
+        # Copy example files to test directory (excluding expected_ files)
         for item in cls.example_dir.iterdir():
             if item.name.startswith("expected_") or item.name == "__pycache__":
                 continue
@@ -58,6 +67,10 @@ class TestDirectPassExample(unittest.TestCase):
     
     def test_build_docs_generates_env_example(self):
         """Test that build_docs.py generates .env.example correctly"""
+        # Skip if no expected file
+        if ".env.example" not in self.expected_files:
+            self.skipTest("No expected_.env.example file found")
+        
         # Run build_docs.py
         result = subprocess.run(
             [sys.executable, "build_docs.py"],
@@ -77,7 +90,7 @@ class TestDirectPassExample(unittest.TestCase):
             generated = f.read()
         
         # Read expected content
-        expected_path = self.example_dir / "expected_.env.example"
+        expected_path = self.expected_files[".env.example"]
         with open(expected_path, 'r') as f:
             expected = f.read()
         
@@ -85,6 +98,10 @@ class TestDirectPassExample(unittest.TestCase):
     
     def test_build_docs_generates_readme(self):
         """Test that build_docs.py generates README.md correctly"""
+        # Skip if no expected file
+        if "README.md" not in self.expected_files:
+            self.skipTest("No expected_README.md file found")
+        
         # Run build_docs.py
         result = subprocess.run(
             [sys.executable, "build_docs.py"],
@@ -104,7 +121,7 @@ class TestDirectPassExample(unittest.TestCase):
             generated = f.read()
         
         # Read expected content
-        expected_path = self.example_dir / "expected_README.md"
+        expected_path = self.expected_files["README.md"]
         with open(expected_path, 'r') as f:
             expected = f.read()
         
@@ -116,6 +133,10 @@ class TestDirectPassExample(unittest.TestCase):
     
     def test_run_with_enable_feature_generates_log(self):
         """Test that run.py --enable-feature generates expected log output"""
+        # Skip if no expected file
+        if "default.log" not in self.expected_files:
+            self.skipTest("No expected_default.log file found")
+        
         # Run with --enable-feature
         result = subprocess.run(
             [sys.executable, "run.py", "--enable-feature"],
@@ -135,7 +156,7 @@ class TestDirectPassExample(unittest.TestCase):
             generated_lines = f.readlines()
         
         # Read expected log
-        expected_path = self.example_dir / "expected_default.log"
+        expected_path = self.expected_files["default.log"]
         with open(expected_path, 'r') as f:
             expected_lines = f.readlines()
         
