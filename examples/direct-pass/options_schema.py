@@ -3,7 +3,7 @@ OPTIONS_SCHEMA = {
         "env": "ENABLE_FEATURE",
         "arg": "--enable-feature",
         "type": bool,
-        "default": False,
+        "default": True,
         "section": "Features",
         "help": "Enable the special feature"
     },

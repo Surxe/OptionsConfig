@@ -4,7 +4,7 @@
 #### Features
 
 - **ENABLE_FEATURE** - Enable the special feature
-  - Default: `"false"`
+  - Default: `"true"`
   - Command line: `--enable-feature`
 
 * **FEATURE_PATH** - Path to the feature configuration file

@@ -14,3 +14,9 @@ python build_docs.py
 * `.env.example` should match `expected_.env.example`
 * `README.md` should match `expected_README.md`
 * `default.log` should match `expected_default.log`
+
+# Overview
+1. Default values are loaded, setting `enable_feature` to `true`, and `feature_path` to `[blank]`
+1. `.env` is loaded, overriding the default values, setting `enable_feature` to `false` and `feature_path` to `path/to/something`
+2. arguments are loaded, overriding the env values, setting `enable_feature` to `true`
+3. Result is `enable_feature=true`, `feature_path=path/to/something` stored in `options`
