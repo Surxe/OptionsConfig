@@ -5,7 +5,7 @@ Example of directly passing all arguments to `ArgumentWriter` and `Options`
 ```python
 cd examples/direct-pass
 python run.py --help
-python run.py --enable-feature --feature-path path/to/something
+python run.py --enable-feature
 python build_docs.py
 ```
 

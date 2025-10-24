@@ -191,6 +191,7 @@ cython_debug/
 # Example files
 !examples/*/.env.example
 !examples/*/expected_default.log
+!examples/*/.env
 
 # Logs
 src/optionsconfig/logs/
