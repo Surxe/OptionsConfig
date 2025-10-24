@@ -48,10 +48,11 @@ def setup_logging(log_file: str | Path | None = None, log_level: str = "DEBUG") 
         pass
     
     # Add handlers
-    logger.add(str(log_path), level=log_level, rotation="30 MB", retention="10 days", enqueue=True)
-    logger.add(sys.stdout, level=log_level)
+    format_with_color = "<level>{level}</level> | <cyan>{module}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+    logger.add(str(log_path), level=log_level, rotation="30 MB", retention="10 days", enqueue=True, format=format_with_color)
+    logger.add(sys.stdout, level=log_level, format=format_with_color)
     
-    logger.debug(f"Logging initialized to: {log_path}")
+    logger.debug(f"Logging initialized to: {log_path} and stdout")
     
     return log_path
 
