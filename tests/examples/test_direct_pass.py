@@ -19,18 +19,28 @@ class TestDirectPassExample(unittest.TestCase):
     def setUpClass(cls):
         """Set up test environment once for all tests"""
         cls.example_dir = Path(__file__).parent.parent.parent / "examples" / "direct-pass"
+        cls.examples_root = Path(__file__).parent.parent.parent / "examples"
         cls.test_dir = Path(__file__).parent / "temp_direct_pass"
         
         # Create test directory
         cls.test_dir.mkdir(parents=True, exist_ok=True)
         
-        # Find all expected files
+        # Find all expected files in both example-specific dir and shared examples/ dir
         cls.expected_files = {}
+        
+        # First check example-specific directory
         for expected_file in cls.example_dir.glob("expected_*"):
             if expected_file.is_file():
                 # Map expected_filename -> actual_filename
                 actual_name = expected_file.name.replace("expected_", "", 1)
                 cls.expected_files[actual_name] = expected_file
+        
+        # Then check shared examples directory (doesn't override example-specific files)
+        for expected_file in cls.examples_root.glob("expected_*"):
+            if expected_file.is_file():
+                actual_name = expected_file.name.replace("expected_", "", 1)
+                if actual_name not in cls.expected_files:
+                    cls.expected_files[actual_name] = expected_file
         
         # Copy example files to test directory (excluding expected_ files)
         for item in cls.example_dir.iterdir():

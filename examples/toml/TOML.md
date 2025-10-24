@@ -11,9 +11,9 @@ python build_docs.py
 
 # Check its working
 * `--help` should list the options in their argument form
-* `.env.example` should be generated
-* `README.md` should be generated
-* `default.log` should contain all debug logs
+* `examples/toml/.env.example` should match `examples/expected_.env.example`
+* `examples/toml/README.md` should match `examples/expected_README.md`
+* `examples/toml/default.log` should match `examples/toml/expected_default.log`
 
 # Overview
 1. `pyproject.toml` specifies `schema_module = "options_schema"` and `log_file = "default.log"`

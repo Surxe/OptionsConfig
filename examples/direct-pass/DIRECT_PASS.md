@@ -11,9 +11,9 @@ python build_docs.py
 
 # Check its working
 * `--help` should list the options in their argument form
-* `.env.example` should match `expected_.env.example`
-* `README.md` should match `expected_README.md`
-* `default.log` should match `expected_default.log`
+* `examples/direct-pass/.env.example` should match `examples/expected_.env.example`
+* `examples/direct-pass/README.md` should match `examples/expected_README.md`
+* `examples/direct-pass/default.log` should match `examples/direct-pass/expected_default.log`
 
 # Overview
 1. Default values are loaded, setting `enable_feature` to `true`, and `feature_path` to `[blank]`
