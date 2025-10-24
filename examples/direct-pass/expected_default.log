@@ -1,3 +1,5 @@
-2025-10-23 21:18:03.695 | INFO     | optionsconfig.options:log:260 - Options initialized with:
+2025-10-23 22:29:07.689 | INFO     | optionsconfig.options:log:260 - Options initialized with:
 ENABLE_FEATURE: True
-FEATURE_PATH: D:/Programs/Git/path/to/config
+FEATURE_PATH: path/to/something
+2025-10-23 22:29:07.689 | DEBUG    | __main__:<module>:13 - Example Retrieval 1: True
+2025-10-23 22:29:07.690 | DEBUG    | __main__:<module>:14 - Example Retrieval 2: path/to/something
