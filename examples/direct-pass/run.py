@@ -3,7 +3,7 @@ from options_schema import OPTIONS_SCHEMA
 import argparse
 from optionsconfig import logger
 
-# Setup logging first
+# Setup logging first, such that the logs for arg writer will be captured
 setup_logging(log_file="default.log", log_level="DEBUG")
 
 # Now that logging is configured, add arguments and parse
