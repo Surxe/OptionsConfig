@@ -25,8 +25,6 @@ See both [examples](examples) and their respective documentation. Each can also 
 * [examples/direct-pass/DIRECT_PASS.md](examples/direct-pass/DIRECT_PASS.md)
 * [examples/toml/TOML.md](examples/toml/TOML.md)
   
-
-
 ## License
 
 MIT License - see [LICENSE](LICENSE)  for details
@@ -35,12 +33,8 @@ MIT License - see [LICENSE](LICENSE)  for details
 
 Contributions welcome! TODO
 
-## Documentation
-
-- **[Quick Reference](QUICK_REFERENCE.md)** - Cheat sheet for common tasks
-- **[Usage Guide](USAGE_GUIDE.md)** - Complete guide for using OptionsConfig in your projects
-- **[Schema Loading](SCHEMA_LOADING.md)** - Detailed information on schema configuration
-- **[Installation Test](INSTALL_TEST.md)** - Verify your installation
+## Schema
+- **[Schema](SCHEMA.md)** - Detailed information on schema configuration
 
 ## Links
 
