@@ -1,0 +1,16 @@
+DEBUG | options:setup_logging:55 - Logging initialized to: default.log and stdout
+DEBUG | argument_writer:add_arguments:30 - Added boolean argument --enable-feature with action 'store_true'
+DEBUG | argument_writer:add_arguments:42 - Added argument --feature-path with type <class 'str'> and default None
+DEBUG | options:__init__:103 - Loaded .env from: D:\Repositories\OptionsConfig\examples\toml\.env
+DEBUG | options:_process_schema:165 - Processing option: ENABLE_FEATURE (attr: enable_feature)
+DEBUG | options:_process_schema:170 - Argument enable_feature found in args with value: True
+DEBUG | options:_process_schema:165 - Processing option: FEATURE_PATH (attr: feature_path)
+DEBUG | options:_process_schema:174 - Environment variable FEATURE_PATH found with value: path/to/something
+DEBUG | options:__init__:146 - Set attribute enable_feature to value: True
+DEBUG | options:__init__:146 - Set attribute feature_path to value: path/to/something
+DEBUG | options:validate:239 - Dependent option FEATURE_PATH is set to path/to/something
+INFO | options:log:257 - Options initialized with:
+ENABLE_FEATURE: True
+FEATURE_PATH: path/to/something
+DEBUG | run:<module>:20 - Example Retrieval of enable_feature: True
+DEBUG | run:<module>:21 - Example Retrieval of feature_path: path/to/something

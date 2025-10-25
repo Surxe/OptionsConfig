@@ -1,0 +1,5 @@
+[tool.optionsconfig]
+schema_module = "options_schema"
+env_example_path = ".env.example"
+readme_path = "README.md"
+log_file = "default.log"

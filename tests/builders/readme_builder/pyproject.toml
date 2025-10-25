@@ -1,0 +1,3 @@
+[tool.optionsconfig]
+schema_module = "readme_builder_schema"
+readme_path = "TEST_README.md"

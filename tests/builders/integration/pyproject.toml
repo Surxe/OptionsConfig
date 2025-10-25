@@ -1,0 +1,4 @@
+[tool.optionsconfig]
+schema_module = "integration_schema"
+env_example_path = "test_toml.env.example"
+readme_path = "test_toml_README.md"
