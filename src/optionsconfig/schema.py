@@ -33,6 +33,7 @@ def get_schema(schema: dict | None = None) -> dict:
     """
     # 1. Direct schema dict
     if schema is not None:
+        schema = default_schema_details(schema)
         validate_schema(schema)
         return schema
     
