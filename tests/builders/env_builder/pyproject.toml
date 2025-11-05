@@ -1,3 +1,0 @@
-[tool.optionsconfig]
-schema_module = "env_builder_schema"
-env_example_path = ".env.example"
