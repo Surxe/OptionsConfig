@@ -3,15 +3,15 @@ from pathlib import Path
 
 
 class OptionDefinition(TypedDict, total=False):
-    env: str # Environment variable name (recommended UPPER_CASE)
-    arg: str # Command line argument (kebab-case with --)
-    var: Optional[str] # Variable name in Python code (recommended snake_case)
-    type: Any # Python type (bool, str, Path, Literal)
-    default: Any # Default value. None means its required if any depends_on option is True
-    section: str # Logical grouping name
-    help: str # Description text
-    depends_on: Optional[List[str]] # List of option names this option depends on (required when ANY of those options are True)
-    sensitive: Optional[bool] # Boolean flag for password masking
+    env: str
+    arg: str
+    var: Optional[str]
+    type: Any
+    default: Any
+    section: str
+    help: str
+    depends_on: Optional[List[str]]
+    sensitive: Optional[bool]
 
 
 def get_schema(schema: dict | None = None) -> dict:
@@ -144,8 +144,6 @@ def validate_schema(schema: dict) -> list[str]:
             env = details["env"]
             if not isinstance(env, str):
                 errors.append(f"{option_name}: 'env' must be a string")
-            elif not env.isupper():
-                errors.append(f"{option_name}: 'env' should be UPPER_CASE (got '{env}')")
         
         # Validate arg format
         if "arg" in details:
