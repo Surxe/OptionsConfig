@@ -1,17 +1,3 @@
-"""
-Schema loading and validation for OPTIONS_SCHEMA.
-
-OPTIONS_SCHEMA format:
-* **env** - Environment variable name (UPPER_CASE)
-* **arg** - Command line argument (kebab-case with --)
-* **type** - Python type (bool, str, Path, Literal)
-* **default** - Default value. None means its required if any depends_on option is True
-* **help** - Description text
-* **section** - Logical grouping name
-* **depends_on** - Optional. List of option names this option depends on (required when ANY of those options are True)
-* **sensitive** - Boolean flag for password masking
-"""
-
 from typing import TypedDict, List, Optional, Any
 from pathlib import Path
 
@@ -19,6 +5,7 @@ from pathlib import Path
 class OptionDefinition(TypedDict, total=False):
     env: str
     arg: str
+    var: Optional[str]
     type: Any
     default: Any
     section: str
@@ -46,12 +33,14 @@ def get_schema(schema: dict | None = None) -> dict:
     """
     # 1. Direct schema dict
     if schema is not None:
+        schema = default_schema_details(schema)
         validate_schema(schema)
         return schema
     
     # 2. Configuration file (pyproject.toml)
     config_schema = _load_schema_from_config()
     if config_schema:
+        config_schema = default_schema_details(config_schema)
         validate_schema(config_schema)
         return config_schema
     
@@ -103,6 +92,18 @@ def load_schema() -> dict | None:
         return get_schema()
     except ImportError:
         return None
+    
+
+def default_schema_details(schema: dict) -> dict:
+    defaulted_schema = schema.copy()
+    for option_name, details in schema.items():
+        if "sensitive" not in details:
+            defaulted_schema[option_name]["sensitive"] = False
+        if "depends_on" not in details:
+            defaulted_schema[option_name]["depends_on"] = []
+        if "var" not in details:
+            defaulted_schema[option_name]["var"] = option_name.lower()
+    return defaulted_schema
 
 
 def validate_schema(schema: dict) -> list[str]:
@@ -125,7 +126,7 @@ def validate_schema(schema: dict) -> list[str]:
         errors.append("Schema is empty")
         return errors
     
-    required_fields = ["env", "arg", "type", "default", "section", "help"]
+    required_fields = ["env", "arg", "var", "type", "default", "section", "help", "sensitive", "depends_on"] # optionals are defaulted beforehand
     
     for option_name, details in schema.items():
         if not isinstance(details, dict):
@@ -142,8 +143,6 @@ def validate_schema(schema: dict) -> list[str]:
             env = details["env"]
             if not isinstance(env, str):
                 errors.append(f"{option_name}: 'env' must be a string")
-            elif not env.isupper():
-                errors.append(f"{option_name}: 'env' should be UPPER_CASE (got '{env}')")
         
         # Validate arg format
         if "arg" in details:

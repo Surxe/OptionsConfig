@@ -9,14 +9,15 @@ This document describes the `OPTIONS_SCHEMA` format and how it's loaded, validat
 ```python
 OPTIONS_SCHEMA = {
     "OPTION_NAME": {
-        "env": "OPTION_NAME",           # Environment variable name (UPPER_CASE)
+        "env": "OPTION_NAME",            # Environment variable name (recommended UPPER_CASE)
         "arg": "--option-name",          # CLI argument (kebab-case with --)
+        "var": "option_name",            # Optional: Python variable (recommended snake_case, defaults to OPTION_NAME.lower())
         "type": str,                     # Python type: bool, str, int, Path, Literal
         "default": "default_value",      # Default value (None if required when dependencies active)
         "section": "Section Name",       # Logical grouping for documentation
         "help": "Description text",      # Help text for CLI and docs
         "depends_on": ["OTHER_OPTION"],  # Optional: List of options this depends on
-        "sensitive": False,              # Optional: Mask value in logs (for passwords)
+        "sensitive": True,               # Optional: Mask value in logs (for passwords)
     },
 }
 ```
@@ -29,7 +30,6 @@ The schema validator checks:
 2. **Required Fields**: All options must have env, arg, type, default, section, help
 3. **Field Types**: env and arg must be strings
 4. **Naming Conventions**:
-   - `env` must be UPPER_CASE
    - `arg` must start with `--`
 5. **Dependencies**: Options in `depends_on` must exist in schema
 6. **Types**: depends_on must be a list if present

@@ -128,7 +128,7 @@ class Options:
         for option_name, details in self.schema.items():
             # An option is a root option if other options depend on it
             is_root = any(
-                option_name in self.schema[other_option].get("depends_on", [])
+                option_name in self.schema[other_option]["depends_on"]
                 for other_option in self.schema
             )
             if is_root:
@@ -140,10 +140,10 @@ class Options:
         # Set attributes dynamically using lowercase underscore format
         for key, value in options.items():
             # Convert schema key (UPPER_CASE) to attribute name (lower_case)
-            attr_name = key.lower()
             details = self.schema[key]
-            setattr(self, attr_name, value)
-            logger.debug(f"Set attribute {attr_name} to value: {value if not details.get('sensitive', False) else '***HIDDEN***'}")
+            var_name = details["var"]
+            setattr(self, var_name, value)
+            logger.debug(f"Set option {var_name} to value: {value if not details['sensitive'] else '***HIDDEN***'}")
 
         self.validate()
         
@@ -157,21 +157,21 @@ class Options:
         # Process all options in the schema
         for option_name, details in schema.items():
             # Convert arg name to attribute name (remove -- and convert - to _)
-            attr_name = details["arg"].lstrip('--').replace('-', '_')
+            var_name = details["var"]
             
             # Get value in order of priority: args -> env -> default
             value = None
 
-            logger.debug(f"Processing option: {option_name} (attr: {attr_name})")
+            logger.debug(f"Processing option: {option_name} (var: {var_name})")
 
             # 1. Check args first
-            if attr_name in args_dict and args_dict[attr_name] is not None:
-                value = args_dict[attr_name]
-                logger.debug(f"Argument {attr_name} found in args with value: {value if not details.get('sensitive', False) else '***HIDDEN***'}")
+            if var_name in args_dict and args_dict[var_name] is not None:
+                value = args_dict[var_name]
+                logger.debug(f"Argument {var_name} found in args with value: {value if not details['sensitive'] else '***HIDDEN***'}")
             # 2. Check environment variable
             elif details["env"] in os.environ:
                 env_value = os.environ[details["env"]]
-                logger.debug(f"Environment variable {details['env']} found with value: {env_value if not details.get('sensitive', False) else '***HIDDEN***'}")
+                logger.debug(f"Environment variable {details['env']} found with value: {env_value if not details['sensitive'] else '***HIDDEN***'}")
                 # Convert environment string to proper type
                 if details["type"] == bool:
                     value = is_truthy(env_value)
@@ -194,9 +194,9 @@ class Options:
         # Check if any root option was explicitly provided (not just defaulted from schema)
         explicitly_set_root_options = []
         for root_option in self.root_options:
-            attr_name = self.schema[root_option]["arg"].lstrip('--').replace('-', '_')
+            var_name = self.schema[root_option]["var"]
             # Check if it was in args or environment
-            if (attr_name in args_dict and args_dict[attr_name] is not None) or \
+            if (var_name in args_dict and args_dict[var_name] is not None) or \
                self.schema[root_option]["env"] in os.environ:
                 explicitly_set_root_options.append(root_option)
         
@@ -214,13 +214,13 @@ class Options:
         
         # Check each option that has dependencies
         for option_name, details in self.schema.items():
-            depends_on_list = details.get("depends_on", [])
+            depends_on_list = details["depends_on"]
             if not depends_on_list:
                 continue
             
             # Check if ANY of the dependencies are True
             any_dependency_true = any(
-                options_as_dict.get(dep_option) is True
+                options_as_dict[dep_option] is True
                 for dep_option in depends_on_list
             )
             
@@ -230,13 +230,13 @@ class Options:
                     # Build a helpful error message
                     active_dependencies = [
                         dep for dep in depends_on_list
-                        if options_as_dict.get(dep) is True
+                        if options_as_dict[dep] is True
                     ]
                     raise ValueError(
                         f"{option_name} is required when any of the following are true: "
                         f"{', '.join(depends_on_list)}. Currently active: {', '.join(active_dependencies)}"
                     )
-                logger.debug(f"Dependent option {option_name} is set to {value if not details.get('sensitive', False) else '***HIDDEN***'}")
+                logger.debug(f"Dependent option {option_name} is set to {value if not details['sensitive'] else '***HIDDEN***'}")
         
     def log(self):
         """
@@ -246,11 +246,11 @@ class Options:
         log_lines = ["Options initialized with:"]
         
         for option_name, details in self.schema.items():
-            attr_name = details["arg"].lstrip('--').replace('-', '_')
-            if hasattr(self, attr_name):
-                value = getattr(self, attr_name)
+            var_name = details["var"]
+            if hasattr(self, var_name):
+                value = getattr(self, var_name)
                 # Don't log sensitive information
-                if details.get("sensitive", False):
+                if details["sensitive"]:
                     value = "***HIDDEN***"
                 log_lines.append(f"{option_name}: {value}")
         
