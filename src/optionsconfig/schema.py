@@ -103,7 +103,6 @@ def default_schema_details(schema: dict) -> dict:
             defaulted_schema[option_name]["depends_on"] = []
         if "var" not in details:
             defaulted_schema[option_name]["var"] = option_name.lower()
-            print(f"Defaulted 'var' for option '{option_name}' to '{option_name.lower()}'")
     return defaulted_schema
 
 
