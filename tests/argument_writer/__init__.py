@@ -1,1 +1,0 @@
-# ArgumentWriter tests package
