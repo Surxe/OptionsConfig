@@ -21,9 +21,10 @@ pip install optionsconfig
 ```
 
 ## Usage
-See both [examples](examples) and their respective documentation. Each can also be used to test the installation.
-* [examples/direct-pass/DIRECT_PASS.md](examples/direct-pass/DIRECT_PASS.md)
-* [examples/toml/TOML.md](examples/toml/TOML.md)
+See both the examples on GitHub and their respective documentation. Each can also be used to test the installation.
+- [Examples directory on GitHub](https://github.com/Surxe/OptionsConfig/tree/main/examples)
+- [DIRECT_PASS.md (direct-pass example)](https://github.com/Surxe/OptionsConfig/blob/main/examples/direct-pass/DIRECT_PASS.md)
+- [TOML.md (toml example)](https://github.com/Surxe/OptionsConfig/blob/main/examples/toml/TOML.md)
   
 ## License
 
@@ -34,7 +35,7 @@ MIT License - see [LICENSE](LICENSE)  for details
 Contributions welcome! TODO
 
 ## Schema
-- **[Schema](SCHEMA.md)** - Detailed information on schema configuration
+- **[Schema](https://github.com/Surxe/OptionsConfig/blob/main/SCHEMA.md)** - Detailed information on schema configuration
 
 ## Links
 
