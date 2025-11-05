@@ -141,25 +141,25 @@ class ReadmeBuilder:
             if depends_on:
                 # Build dependency string
                 dep_str = " or ".join(depends_on)
-                default_str = f"None - required when {dep_str} is True"
+                starter_str = f"None - required when {dep_str} is True"
             else:
-                default_str = "None"
+                starter_str = "None"
         elif isinstance(default, bool):
-            default_str = f'`"{str(default).lower()}"`'
+            starter_str = f'`"{str(default).lower()}"`'
         elif isinstance(default, str):
             if default == "":
-                default_str = '`""` (empty)'
+                starter_str = '`""` (empty)'
             else:
-                default_str = f'`"{default}"`'
+                starter_str = f'`"{default}"`'
         else:
-            default_str = f'`"{default}"`'
+            starter_str = f'`"{default}"`'
         
         # Create the option entry
         indent = "  " * indent_level if is_dependent else ""
         bullet = "-" if not is_dependent else "*"
         
         lines.append(f"{indent}{bullet} **{env_var}** - {help_text}")
-        lines.append(f"{indent}  - Default: {default_str}")
+        lines.append(f"{indent}  - Default: {starter_str}")
         lines.append(f"{indent}  - Command line: `{arg_name}`")
         
         # Add dependency information if present

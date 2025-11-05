@@ -110,19 +110,30 @@ class EnvBuilder:
             """Process a single option and add it to the lines."""
             env_var = details["env"]
             help_text = details.get("help", "")
-            default = details.get("default", "")
+            example = details.get("example", None)
+            default = details.get("default", None)
             depends_on = details.get("depends_on", [])
-            
-            # Convert default value to string representation for .env file
-            if default is None:
-                default_str = ""
-            elif isinstance(default, bool):
-                default_str = "True" if default else "False"
-            elif isinstance(default, Path):
-                default_str = str(default) if default else ""
+
+            # If example is present, the starter value is the example, otherwise, its the default value with # default appended
+            if example is not None:
+                starter = example
             else:
-                default_str = str(default)
+                starter = default
+            print(example, starter, default)
+
+            # Convert default value to string representation for .env file
+            if starter is None:
+                starter_str = ""
+            elif isinstance(starter, bool):
+                starter_str = "True" if starter else "False"
+            elif isinstance(starter, Path):
+                starter_str = str(starter) if starter else ""
+            else:
+                starter_str = str(starter)
             
+            if example is None:
+                starter_str = f"{starter_str} # default"
+
             # Add comment with help text
             if help_text:
                 # Wrap long help text
@@ -147,7 +158,7 @@ class EnvBuilder:
                 lines.append(f"# Required when {dep_str} is True")
             
             # Add the environment variable with default value
-            lines.append(f'{env_var}="{default_str}"')
+            lines.append(f'{env_var}="{starter_str}"')
             lines.append("")  # Blank line after each option
         
         # Group options by section while preserving order
