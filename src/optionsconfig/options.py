@@ -140,10 +140,10 @@ class Options:
         # Set attributes dynamically using lowercase underscore format
         for key, value in options.items():
             # Convert schema key (UPPER_CASE) to attribute name (lower_case)
-            attr_name = key.lower()
             details = self.schema[key]
-            setattr(self, attr_name, value)
-            logger.debug(f"Set attribute {attr_name} to value: {value if not details.get('sensitive', False) else '***HIDDEN***'}")
+            var_name = details["var"]
+            setattr(self, var_name, value)
+            logger.debug(f"Set option {var_name} to value: {value if not details.get('sensitive', False) else '***HIDDEN***'}")
 
         self.validate()
         
@@ -157,17 +157,17 @@ class Options:
         # Process all options in the schema
         for option_name, details in schema.items():
             # Convert arg name to attribute name (remove -- and convert - to _)
-            attr_name = details["arg"].lstrip('--').replace('-', '_')
+            var_name = details["var"]
             
             # Get value in order of priority: args -> env -> default
             value = None
 
-            logger.debug(f"Processing option: {option_name} (attr: {attr_name})")
+            logger.debug(f"Processing option: {option_name} (var: {var_name})")
 
             # 1. Check args first
-            if attr_name in args_dict and args_dict[attr_name] is not None:
-                value = args_dict[attr_name]
-                logger.debug(f"Argument {attr_name} found in args with value: {value if not details.get('sensitive', False) else '***HIDDEN***'}")
+            if var_name in args_dict and args_dict[var_name] is not None:
+                value = args_dict[var_name]
+                logger.debug(f"Argument {var_name} found in args with value: {value if not details.get('sensitive', False) else '***HIDDEN***'}")
             # 2. Check environment variable
             elif details["env"] in os.environ:
                 env_value = os.environ[details["env"]]
@@ -194,9 +194,9 @@ class Options:
         # Check if any root option was explicitly provided (not just defaulted from schema)
         explicitly_set_root_options = []
         for root_option in self.root_options:
-            attr_name = self.schema[root_option]["arg"].lstrip('--').replace('-', '_')
+            var_name = self.schema[root_option]["var"]
             # Check if it was in args or environment
-            if (attr_name in args_dict and args_dict[attr_name] is not None) or \
+            if (var_name in args_dict and args_dict[var_name] is not None) or \
                self.schema[root_option]["env"] in os.environ:
                 explicitly_set_root_options.append(root_option)
         
@@ -246,9 +246,9 @@ class Options:
         log_lines = ["Options initialized with:"]
         
         for option_name, details in self.schema.items():
-            attr_name = details["arg"].lstrip('--').replace('-', '_')
-            if hasattr(self, attr_name):
-                value = getattr(self, attr_name)
+            var_name = details["var"]
+            if hasattr(self, var_name):
+                value = getattr(self, var_name)
                 # Don't log sensitive information
                 if details.get("sensitive", False):
                     value = "***HIDDEN***"
