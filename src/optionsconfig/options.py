@@ -128,7 +128,7 @@ class Options:
         for option_name, details in self.schema.items():
             # An option is a root option if other options depend on it
             is_root = any(
-                option_name in self.schema[other_option].get("depends_on", [])
+                option_name in self.schema[other_option]["depends_on"]
                 for other_option in self.schema
             )
             if is_root:
@@ -143,7 +143,7 @@ class Options:
             details = self.schema[key]
             var_name = details["var"]
             setattr(self, var_name, value)
-            logger.debug(f"Set option {var_name} to value: {value if not details.get('sensitive', False) else '***HIDDEN***'}")
+            logger.debug(f"Set option {var_name} to value: {value if not details['sensitive'] else '***HIDDEN***'}")
 
         self.validate()
         
@@ -167,11 +167,11 @@ class Options:
             # 1. Check args first
             if var_name in args_dict and args_dict[var_name] is not None:
                 value = args_dict[var_name]
-                logger.debug(f"Argument {var_name} found in args with value: {value if not details.get('sensitive', False) else '***HIDDEN***'}")
+                logger.debug(f"Argument {var_name} found in args with value: {value if not details['sensitive'] else '***HIDDEN***'}")
             # 2. Check environment variable
             elif details["env"] in os.environ:
                 env_value = os.environ[details["env"]]
-                logger.debug(f"Environment variable {details['env']} found with value: {env_value if not details.get('sensitive', False) else '***HIDDEN***'}")
+                logger.debug(f"Environment variable {details['env']} found with value: {env_value if not details['sensitive'] else '***HIDDEN***'}")
                 # Convert environment string to proper type
                 if details["type"] == bool:
                     value = is_truthy(env_value)
@@ -214,13 +214,13 @@ class Options:
         
         # Check each option that has dependencies
         for option_name, details in self.schema.items():
-            depends_on_list = details.get("depends_on", [])
+            depends_on_list = details["depends_on"]
             if not depends_on_list:
                 continue
             
             # Check if ANY of the dependencies are True
             any_dependency_true = any(
-                options_as_dict.get(dep_option) is True
+                options_as_dict[dep_option] is True
                 for dep_option in depends_on_list
             )
             
@@ -230,13 +230,13 @@ class Options:
                     # Build a helpful error message
                     active_dependencies = [
                         dep for dep in depends_on_list
-                        if options_as_dict.get(dep) is True
+                        if options_as_dict[dep] is True
                     ]
                     raise ValueError(
                         f"{option_name} is required when any of the following are true: "
                         f"{', '.join(depends_on_list)}. Currently active: {', '.join(active_dependencies)}"
                     )
-                logger.debug(f"Dependent option {option_name} is set to {value if not details.get('sensitive', False) else '***HIDDEN***'}")
+                logger.debug(f"Dependent option {option_name} is set to {value if not details['sensitive'] else '***HIDDEN***'}")
         
     def log(self):
         """
@@ -250,7 +250,7 @@ class Options:
             if hasattr(self, var_name):
                 value = getattr(self, var_name)
                 # Don't log sensitive information
-                if details.get("sensitive", False):
+                if details["sensitive"]:
                     value = "***HIDDEN***"
                 log_lines.append(f"{option_name}: {value}")
         
