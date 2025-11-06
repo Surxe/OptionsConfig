@@ -44,5 +44,4 @@ If an option is a **root option** (other options depend on it) and NO root optio
 
 - [options.py](src/optionsconfig/options.py) - Options class implementation
 - [schema.py](src/optionsconfig/schema.py) - Schema loading and validation
-- [examples/direct-pass/](examples/direct-pass/) - Example with direct schema parameter
 - [examples/toml/](examples/toml/) - Example using pyproject.toml

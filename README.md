@@ -21,9 +21,7 @@ pip install optionsconfig
 ```
 
 ## Usage
-See both the examples on GitHub and their respective documentation. Each can also be used to test the installation.
-- [Examples directory on GitHub](https://github.com/Surxe/OptionsConfig/tree/main/examples)
-- [DIRECT_PASS.md (direct-pass example)](https://github.com/Surxe/OptionsConfig/blob/main/examples/direct-pass/DIRECT_PASS.md)
+See the example and its documentation on GitHub. Can also be used to test the installation.
 - [TOML.md (toml example)](https://github.com/Surxe/OptionsConfig/blob/main/examples/toml/TOML.md)
   
 ## License
