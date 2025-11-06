@@ -10,6 +10,7 @@ class OptionDefinition(TypedDict, total=False):
     default: Any
     section: str
     help: str
+    help_extended: Optional[str]
     example: Optional[Any]
     depends_on: Optional[List[str]]
     sensitive: Optional[bool]
@@ -35,14 +36,18 @@ def get_schema(schema: dict | None = None) -> dict:
     # 1. Direct schema dict
     if schema is not None:
         schema = default_schema_details(schema)
-        validate_schema(schema)
+        errors = validate_schema(schema)
+        if errors:
+            raise ValueError("Invalid schema: " + "\n".join(errors))
         return schema
     
     # 2. Configuration file (pyproject.toml)
     config_schema = _load_schema_from_config()
     if config_schema:
         config_schema = default_schema_details(config_schema)
-        validate_schema(config_schema)
+        errors = validate_schema(config_schema)
+        if errors:
+            raise ValueError("Invalid schema: " + "\n".join(errors))
         return config_schema
     
     raise ImportError(
@@ -162,6 +167,10 @@ def validate_schema(schema: dict) -> list[str]:
                 for dep in depends_on:
                     if dep not in schema:
                         errors.append(f"{option_name}: depends on non-existent option '{dep}'")
+                    else:
+                        dep_type = schema[dep].get("type")
+                        if dep_type is not bool:
+                            errors.append(f"{option_name}: can only depend on boolean options ('{dep}' is of type '{dep_type}')")
 
         # Validate example
         # It should be the same type as `type`
@@ -170,5 +179,10 @@ def validate_schema(schema: dict) -> list[str]:
             expected_type = details.get("type")
             if expected_type and not isinstance(example, expected_type):
                 errors.append(f"{option_name}: 'example' should be of type '{expected_type.__name__}'")
+
+        # Ensure all details are in OptionDefinition class
+        for key in details.keys():
+            if key not in OptionDefinition.__annotations__:
+                errors.append(f"{option_name}: Unknown field '{key}' in option definition")
     
     return errors
