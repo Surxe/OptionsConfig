@@ -11,6 +11,7 @@ class OptionDefinition(TypedDict, total=False):
     section: str
     help: str
     help_extended: Optional[str]
+    links: Optional[dict[str, str]]
     example: Optional[Any]
     depends_on: Optional[List[str]]
     sensitive: Optional[bool]

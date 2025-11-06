@@ -17,6 +17,7 @@ OPTIONS_SCHEMA = {
         "section": "Section Name",                    # Logical grouping for documentation
         "help": "Description text",                   # Help text for CLI and docs
         "help_extended": "Extended description text": # Optional: Extended help text for the README only
+        "links": {"link_name": "link_url"}            # Optional: Links to be included in the README only
         "example": "example value"                    # Optional: Example value for the docs only
         "depends_on": ["OTHER_OPTION"],               # Optional: List of options this depends on. OPTION_NAME is required only if one or more of their dependencies is true
         "sensitive": True,                            # Optional: Mask value in logs (for passwords)
