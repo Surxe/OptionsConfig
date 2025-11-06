@@ -1,7 +1,7 @@
 # Documentation on this specific example
 Example of using `pyproject.toml` to configure schema module and log file path, without directly passing arguments to `ArgumentWriter` and `Options`
 
-First, create a virtual environment with the dependencies in [examples/toml/pyproject.toml](/examples/toml/pyproject.toml)
+First, create a virtual environment with optionsconfig installed.
 
 # Testing the example
 ```python

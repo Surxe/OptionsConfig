@@ -6,7 +6,6 @@ This script creates markdown documentation for all options that can be
 included in the README.md file, ensuring documentation stays in sync.
 """
 
-import os
 import sys
 import re
 from pathlib import Path
@@ -141,25 +140,25 @@ class ReadmeBuilder:
             if depends_on:
                 # Build dependency string
                 dep_str = " or ".join(depends_on)
-                starter_str = f"None - required when {dep_str} is True"
+                default_str = f"None - required when {dep_str} is True"
             else:
-                starter_str = "None"
+                default_str = "None"
         elif isinstance(default, bool):
-            starter_str = f'`"{str(default).lower()}"`'
+            default_str = f'`"{str(default).lower()}"`'
         elif isinstance(default, str):
             if default == "":
-                starter_str = '`""` (empty)'
+                default_str = '`""` (empty)'
             else:
-                starter_str = f'`"{default}"`'
+                default_str = f'`"{default}"`'
         else:
-            starter_str = f'`"{default}"`'
+            default_str = f'`"{default}"`'
         
         # Create the option entry
         indent = "  " * indent_level if is_dependent else ""
         bullet = "-" if not is_dependent else "*"
         
         lines.append(f"{indent}{bullet} **{env_var}** - {help_text}")
-        lines.append(f"{indent}  - Default: {starter_str}")
+        lines.append(f"{indent}  - Default: {default_str}")
         lines.append(f"{indent}  - Command line: `{arg_name}`")
         
         # Add dependency information if present
