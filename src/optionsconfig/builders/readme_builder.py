@@ -6,7 +6,6 @@ This script creates markdown documentation for all options that can be
 included in the README.md file, ensuring documentation stays in sync.
 """
 
-import os
 import sys
 import re
 from pathlib import Path
@@ -135,6 +134,7 @@ class ReadmeBuilder:
         default = details.get("default", "")
         arg_name = details["arg"]
         depends_on = details.get("depends_on", [])
+        example = details.get("example", None)
         
         # Convert default value to readable string
         if default is None:
@@ -153,12 +153,22 @@ class ReadmeBuilder:
                 default_str = f'`"{default}"`'
         else:
             default_str = f'`"{default}"`'
+
+        # Convert example value to readable string
+        example_str = None
+        if example is not None:
+            if isinstance(example, bool):
+                example_str = f'`"{str(example).lower()}"`'
+            else:
+                example_str = f'`"{example}"`'
         
         # Create the option entry
         indent = "  " * indent_level if is_dependent else ""
         bullet = "-" if not is_dependent else "*"
         
         lines.append(f"{indent}{bullet} **{env_var}** - {help_text}")
+        if example_str:
+            lines.append(f"{indent}  - Example: {example_str}")
         lines.append(f"{indent}  - Default: {default_str}")
         lines.append(f"{indent}  - Command line: `{arg_name}`")
         

@@ -6,7 +6,6 @@ This script creates a new .env.example file based on the option schema,
 ensuring documentation stays in sync with the actual option definitions.
 """
 
-import os
 import sys
 from pathlib import Path
 from typing import Dict, Any
@@ -110,19 +109,24 @@ class EnvBuilder:
             """Process a single option and add it to the lines."""
             env_var = details["env"]
             help_text = details.get("help", "")
-            default = details.get("default", "")
+            example = details.get("example", None)
+            default = details.get("default", None)
             depends_on = details.get("depends_on", [])
-            
+
             # Convert default value to string representation for .env file
-            if default is None:
-                default_str = ""
-            elif isinstance(default, bool):
-                default_str = "True" if default else "False"
-            elif isinstance(default, Path):
-                default_str = str(default) if default else ""
-            else:
-                default_str = str(default)
-            
+            def _str_repr(value: Any) -> str:
+                """Convert a value to its string representation for .env file."""
+                if value is None:
+                    return ""
+                elif isinstance(value, bool):
+                    return "True" if value else "False"
+                elif isinstance(value, Path):
+                    return str(value) if value else ""
+                else:
+                    return str(value)
+            default_str = _str_repr(default)
+            example_str = _str_repr(example)
+
             # Add comment with help text
             if help_text:
                 # Wrap long help text
@@ -147,6 +151,8 @@ class EnvBuilder:
                 lines.append(f"# Required when {dep_str} is True")
             
             # Add the environment variable with default value
+            if example_str:
+                lines.append(f'# Example: {example_str}')
             lines.append(f'{env_var}="{default_str}"')
             lines.append("")  # Blank line after each option
         

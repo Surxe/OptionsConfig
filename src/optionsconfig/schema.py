@@ -10,6 +10,7 @@ class OptionDefinition(TypedDict, total=False):
     default: Any
     section: str
     help: str
+    example: Optional[Any]
     depends_on: Optional[List[str]]
     sensitive: Optional[bool]
 
@@ -126,7 +127,7 @@ def validate_schema(schema: dict) -> list[str]:
         errors.append("Schema is empty")
         return errors
     
-    required_fields = ["env", "arg", "var", "type", "default", "section", "help", "sensitive", "depends_on"] # optionals are defaulted beforehand
+    required_fields = ["env", "arg", "var", "type", "default", "section", "help", "sensitive", "depends_on"] # some are defaulted beforehand
     
     for option_name, details in schema.items():
         if not isinstance(details, dict):
@@ -161,5 +162,13 @@ def validate_schema(schema: dict) -> list[str]:
                 for dep in depends_on:
                     if dep not in schema:
                         errors.append(f"{option_name}: depends on non-existent option '{dep}'")
+
+        # Validate example
+        # It should be the same type as `type`
+        if "example" in details:
+            example = details["example"]
+            expected_type = details.get("type")
+            if expected_type and not isinstance(example, expected_type):
+                errors.append(f"{option_name}: 'example' should be of type '{expected_type.__name__}'")
     
     return errors
