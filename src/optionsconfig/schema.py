@@ -162,6 +162,10 @@ def validate_schema(schema: dict) -> list[str]:
                 for dep in depends_on:
                     if dep not in schema:
                         errors.append(f"{option_name}: depends on non-existent option '{dep}'")
+                    else:
+                        dep_type = schema[dep].get("type")
+                        if dep_type is not bool:
+                            errors.append(f"{option_name}: can only depend on boolean options ('{dep}' is of type '{dep_type}')")
 
         # Validate example
         # It should be the same type as `type`
