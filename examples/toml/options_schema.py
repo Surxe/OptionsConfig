@@ -1,3 +1,5 @@
+from pathlib import Path
+
 OPTIONS_SCHEMA = {
     "ENABLE_FEATURE": {
         "env": "ENABLE_FEATURE",
@@ -10,12 +12,12 @@ OPTIONS_SCHEMA = {
     "FEATURE_PATH": {
         "env": "FEATURE_PATH",
         "arg": "--feature-path",
-        "type": str,
+        "type": Path,
         "default": None,
         "section": "Features",
         "depends_on": ["ENABLE_FEATURE"],
         "help": "Path to the feature configuration file",
-        "example": "/path/to/feature.py",
+        "example": Path("C:/example/path/to/feature.py"),
         "links": {
             "Documentation": "https://example.com/docs/feature-path"
         }

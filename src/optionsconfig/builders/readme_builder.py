@@ -8,6 +8,7 @@ included in the README.md file, ensuring documentation stays in sync.
 
 import sys
 import re
+import os
 from pathlib import Path
 from typing import Dict, Any
 
@@ -159,6 +160,9 @@ class ReadmeBuilder:
         if example is not None:
             if isinstance(example, bool):
                 example_str = f'`"{str(example).lower()}"`'
+            elif isinstance(example, Path):
+                # Convert Path to string using forward slashes
+                example_str = f'`"{str(example).replace(os.sep, "/")}"`'
             else:
                 example_str = f'`"{example}"`'
         
