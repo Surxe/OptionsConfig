@@ -15,6 +15,9 @@ OPTIONS_SCHEMA = {
         "section": "Features",
         "depends_on": ["ENABLE_FEATURE"],
         "help": "Path to the feature configuration file",
-        "example": "/path/to/feature.py"
+        "example": "/path/to/feature.py",
+        "links": {
+            "Documentation": "https://example.com/docs/feature-path"
+        }
     },
 }
