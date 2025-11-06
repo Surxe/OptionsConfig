@@ -10,6 +10,7 @@ class OptionDefinition(TypedDict, total=False):
     default: Any
     section: str
     help: str
+    help_extended: Optional[str]
     example: Optional[Any]
     depends_on: Optional[List[str]]
     sensitive: Optional[bool]
