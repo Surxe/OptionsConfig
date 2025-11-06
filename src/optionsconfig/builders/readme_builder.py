@@ -180,7 +180,7 @@ class ReadmeBuilder:
         # Add links if present
         if "links" in details:
             for link_name, link_url in details["links"].items():
-                lines.append(f"{indent}  - See [{link_name}]({link_url}) for available values")
+                lines.append(f"{indent}  - [{link_name}]({link_url})")
         
         # Add extended help if present
         if "help_extended" in details:
