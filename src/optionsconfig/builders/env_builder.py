@@ -113,25 +113,19 @@ class EnvBuilder:
             default = details.get("default", None)
             depends_on = details.get("depends_on", [])
 
-            # If example is present, the starter value is the example, otherwise, its the default value with # default appended
-            if example is not None:
-                starter = example
-            else:
-                starter = default
-            print(example, starter, default)
-
             # Convert default value to string representation for .env file
-            if starter is None:
-                starter_str = ""
-            elif isinstance(starter, bool):
-                starter_str = "True" if starter else "False"
-            elif isinstance(starter, Path):
-                starter_str = str(starter) if starter else ""
-            else:
-                starter_str = str(starter)
-            
-            if example is None:
-                starter_str = f"{starter_str} # default"
+            def _str_repr(value: Any) -> str:
+                """Convert a value to its string representation for .env file."""
+                if value is None:
+                    return ""
+                elif isinstance(value, bool):
+                    return "True" if value else "False"
+                elif isinstance(value, Path):
+                    return str(value) if value else ""
+                else:
+                    return str(value)
+            default_str = _str_repr(default)
+            example_str = _str_repr(example)
 
             # Add comment with help text
             if help_text:
@@ -157,7 +151,9 @@ class EnvBuilder:
                 lines.append(f"# Required when {dep_str} is True")
             
             # Add the environment variable with default value
-            lines.append(f'{env_var}="{starter_str}"')
+            if example_str:
+                lines.append(f'# Example: {example_str}')
+            lines.append(f'{env_var}="{default_str}"')
             lines.append("")  # Blank line after each option
         
         # Group options by section while preserving order
