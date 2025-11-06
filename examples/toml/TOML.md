@@ -1,6 +1,8 @@
 # Documentation on this specific example
 Example of using `pyproject.toml` to configure schema module and log file path, without directly passing arguments to `ArgumentWriter` and `Options`
 
+First, create a virtual environment with the dependencies in [examples/toml/pyproject.toml](/examples/toml/pyproject.toml)
+
 # Testing the example
 ```python
 cd examples/toml
@@ -21,9 +23,3 @@ python build_docs.py
 3. `.env` is loaded, overriding the default values, setting `enable_feature` to `true` and `feature_path` to `path/to/something`
 4. Arguments are loaded, overriding the env values if provided
 5. Result is stored in `options` object
-
-# Key Differences from direct-pass
-* No schema parameter passed to `ArgumentWriter()` or `init_options()`
-* Schema is automatically loaded from `pyproject.toml` via `schema_module` setting
-* Log file path can be configured in `pyproject.toml` via `log_file` setting
-* Cleaner code with less boilerplate

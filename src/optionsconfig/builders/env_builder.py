@@ -6,7 +6,6 @@ This script creates a new .env.example file based on the option schema,
 ensuring documentation stays in sync with the actual option definitions.
 """
 
-import os
 import sys
 from pathlib import Path
 from typing import Dict, Any
