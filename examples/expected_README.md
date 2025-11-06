@@ -12,6 +12,7 @@
   - Default: None - required when ENABLE_FEATURE is True
   - Command line: `--feature-path`
   - Depends on: `ENABLE_FEATURE`
+  - [Documentation](https://example.com/docs/feature-path)
 
 
 <!-- END_GENERATED_OPTIONS -->
