@@ -37,6 +37,20 @@ The schema validator checks:
 5. **Dependencies**: Options in `depends_on` must exist in schema
 6. **Types**: depends_on must be a list if present
 
+## Boolean Arguments
+
+For options defined with `"type": bool`, the command-line argument behaves as follows:
+
+| Command | Result | Notes |
+|---------|--------|-------|
+| `python run.py --option-name` | `True` | Acts as a flag |
+| `python run.py --option-name true` | `True` | Explicit value (case-insensitive) |
+| `python run.py --option-name false` | `False` | Explicit value (case-insensitive) |
+| `python run.py` | `default` | Uses the default value from schema |
+
+Supported truthy values: `yes`, `true`, `t`, `y`, `1`
+Supported falsy values: `no`, `false`, `f`, `n`, `0`
+
 ## Root Options Auto-True Behavior
 
 If an option is a **root option** (other options depend on it) and NO root options are explicitly set via CLI args or environment variables, ALL root options default to `True`.
