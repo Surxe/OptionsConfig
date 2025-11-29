@@ -1,16 +1,16 @@
 DEBUG | options:setup_logging:55 - Logging initialized to: default.log and stdout
-DEBUG | argument_writer:add_arguments:30 - Added boolean argument --enable-feature with action 'store_true'
-DEBUG | argument_writer:add_arguments:42 - Added argument --feature-path with type <class 'str'> and default None
+DEBUG | argument_writer:add_arguments:41 - Added boolean argument --enable-feature with str2bool, const=True and default None
+DEBUG | argument_writer:add_arguments:50 - Added path argument --feature-path with default None
+DEBUG | argument_writer:add_arguments:54 - All arguments added to parser. Actual defaults will be set when the schema, args, and env are processed together.
 DEBUG | options:__init__:103 - Loaded .env from: D:\Repositories\OptionsConfig\examples\toml\.env
-DEBUG | options:_process_schema:165 - Processing option: ENABLE_FEATURE (attr: enable_feature)
-DEBUG | options:_process_schema:170 - Argument enable_feature found in args with value: True
-DEBUG | options:_process_schema:165 - Processing option: FEATURE_PATH (attr: feature_path)
+DEBUG | options:_process_schema:165 - Processing option: ENABLE_FEATURE (var: enable_feature)
+DEBUG | options:_process_schema:170 - Argument enable_feature found in args with value: False
+DEBUG | options:_process_schema:165 - Processing option: FEATURE_PATH (var: feature_path)
 DEBUG | options:_process_schema:174 - Environment variable FEATURE_PATH found with value: path/to/something
-DEBUG | options:__init__:146 - Set attribute enable_feature to value: True
-DEBUG | options:__init__:146 - Set attribute feature_path to value: path/to/something
-DEBUG | options:validate:239 - Dependent option FEATURE_PATH is set to path/to/something
+DEBUG | options:__init__:146 - Set option enable_feature to value: False
+DEBUG | options:__init__:146 - Set option feature_path to value: path\to\something
 INFO | options:log:257 - Options initialized with:
-ENABLE_FEATURE: True
-FEATURE_PATH: path/to/something
-DEBUG | run:<module>:20 - Example Retrieval of enable_feature: True
-DEBUG | run:<module>:21 - Example Retrieval of feature_path: path/to/something
+ENABLE_FEATURE: False
+FEATURE_PATH: path\to\something
+DEBUG | run:<module>:20 - Example Retrieval of enable_feature: False
+DEBUG | run:<module>:21 - Example Retrieval of feature_path: path\to\something
