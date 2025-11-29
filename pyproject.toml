@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "optionsconfig"
-version = "0.2.2"
+version = "0.3.0"
 description = "Unified configuration management for environment variables, CLI arguments, and documentation"
 readme = "README.md"
 requires-python = ">=3.8"
