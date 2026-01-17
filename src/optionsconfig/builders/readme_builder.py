@@ -218,10 +218,23 @@ class ReadmeBuilder:
                 )
             
             # Replace content between markers
-            pattern = f"{re.escape(start_marker)}.*?{re.escape(end_marker)}"
-            replacement = f"{start_marker}\n{options_content}\n{end_marker}"
+            start_pos = readme_content.find(start_marker)
+            end_pos = readme_content.find(end_marker)
             
-            new_readme_content = re.sub(pattern, replacement, readme_content, flags=re.DOTALL)
+            if start_pos == -1 or end_pos == -1:
+                raise ValueError(
+                    f"Markers not found in {self.readme_file}\n"
+                    f"Add these markers where you want the option docs:\n"
+                    f"    {start_marker}\n"
+                    f"    {end_marker}"
+                )
+            
+            # Get content before start marker and after end marker
+            before_content = readme_content[:start_pos]
+            after_content = readme_content[end_pos + len(end_marker):]
+            
+            # Combine with new content
+            new_readme_content = f"{before_content}{start_marker}\n{options_content}\n{end_marker}{after_content}"
             
             # Write updated README
             with open(self.readme_file, "w", encoding="utf-8") as f:
