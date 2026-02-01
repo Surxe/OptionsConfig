@@ -22,4 +22,13 @@ OPTIONS_SCHEMA = {
             "Documentation": "https://example.com/docs/feature-path"
         }
     },
+    "LOG_LEVEL": {
+        "env": "LOG_LEVEL",
+        "arg": "--log-level",
+        "type": str,
+        "default": "INFO",
+        "section": "Logging",
+        "help": "Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+        "example": "DEBUG"
+    },
 }
