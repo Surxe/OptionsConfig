@@ -12,14 +12,14 @@ from loguru import logger
 
 from .schema import get_schema
 
-
-def setup_logging(log_file: str | Path | None = None, log_level: str = "DEBUG") -> Path:
+def setup_logging(log_file: str | Path | None = None, log_level: str = "DEBUG", delete_existing: bool = False) -> Path:
     """
     Setup loguru logging to the specified log file.
     
     Args:
         log_file: Path to log file. If None, uses default location.
         log_level: Logging level (default: DEBUG)
+        delete_existing: Whether to delete existing loggers (default: False)
         
     Returns:
         Path to the log file being used
@@ -40,17 +40,42 @@ def setup_logging(log_file: str | Path | None = None, log_level: str = "DEBUG") 
     # Ensure parent directory exists
     os.makedirs(log_path.parent, exist_ok=True)
     
-    # Remove existing handlers
-    logger.remove()
+    # Delete existing loggers if requested
+    if delete_existing:
+        logger.remove()
+        # Clear the log file when deleting existing loggers
+        with open(log_path, 'w') as f:
+            pass
     
-    # Clear the log file before adding the handler
-    with open(log_path, 'w') as f:
-        pass
+    # Check existing handlers and merge instead of replace
+    existing_handlers = logger._core.handlers
+    file_handler_exists = any(str(log_path) in str(handler) for handler in existing_handlers.values())
+    stdout_handler_exists = any("stdout" in str(handler) or "sys.stdout" in str(handler) for handler in existing_handlers.values())
     
-    # Add handlers
+    # Add or update handlers
     format_with_color = "<level>{level}</level> | <cyan>{module}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
-    logger.add(str(log_path), level=log_level, rotation="30 MB", retention="10 days", enqueue=True, format=format_with_color)
-    logger.add(sys.stdout, level=log_level, format=format_with_color)
+    
+    if not file_handler_exists:
+        # Add new file handler with append mode (don't clear file)
+        logger.add(str(log_path), level=log_level, rotation="30 MB", retention="10 days", enqueue=True, format=format_with_color, mode="a")
+    else:
+        # Remove existing file handler and add new one with updated level
+        for handler_id, handler in existing_handlers.items():
+            if str(log_path) in str(handler):
+                logger.remove(handler_id)
+                break
+        logger.add(str(log_path), level=log_level, rotation="30 MB", retention="10 days", enqueue=True, format=format_with_color, mode="a")
+    
+    if not stdout_handler_exists:
+        # Add new stdout handler
+        logger.add(sys.stdout, level=log_level, format=format_with_color)
+    else:
+        # Remove existing stdout handler and add new one with updated level
+        for handler_id, handler in existing_handlers.items():
+            if "stdout" in str(handler) or "sys.stdout" in str(handler):
+                logger.remove(handler_id)
+                break
+        logger.add(sys.stdout, level=log_level, format=format_with_color)
     
     logger.debug(f"Logging initialized to: {log_path} and stdout")
     
@@ -108,7 +133,7 @@ class Options:
         
         # Setup logging if requested
         if setup_logger:
-            self.log_file = setup_logging(log_file=log_file, log_level=getattr(self, 'log_level', 'DEBUG'))
+            self.log_file = setup_logging(log_file=log_file, log_level=getattr(self, 'log_level', 'DEBUG'), delete_existing=True)
         else:
             self.log_file = Path(log_file) if log_file else None
 
