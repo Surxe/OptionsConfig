@@ -145,6 +145,10 @@ class Options:
             setattr(self, var_name, value)
             logger.debug(f"Set option {var_name} to value: {value if not details['sensitive'] else '***HIDDEN***'}")
 
+        # Set log level
+        if setup_logger and getattr(self, 'log_file', None) is not None:
+            setup_logging(log_file=self.log_file, log_level=self.log_level)
+
         self.validate()
         
         self.log()
