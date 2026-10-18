@@ -122,9 +122,10 @@ class Options:
         cwd = Path.cwd()
         env_file = cwd / ".env"
         
-        # Explicitly load .env file if it exists
+        # Explicitly load .env file if it exists. override=False keeps variables already
+        # in the shell environment, so precedence is args > env > .env > defaults.
         if env_file.exists():
-            load_dotenv(dotenv_path=env_file, override=True)
+            load_dotenv(dotenv_path=env_file, override=False)
             logger.debug(f"Loaded .env from: {env_file}")
         else:
             logger.debug(f".env not found at: {env_file}")
