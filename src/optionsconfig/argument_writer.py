@@ -45,8 +45,9 @@ class ArgumentWriter:
                 parser.add_argument(arg_name, choices=choices, default=None, help=help_text)
                 logger.debug(f"Added choice argument {arg_name} with choices {choices} and default None")
             elif arg_type == Path:
-                # Handle Path types
-                parser.add_argument(arg_name, type=str, default=None, help=help_text)
+                # Handle Path types: convert here so args match env, which is converted
+                # to Path during option processing.
+                parser.add_argument(arg_name, type=Path, default=None, help=help_text)
                 logger.debug(f"Added path argument {arg_name} with default None")
             else:
                 parser.add_argument(arg_name, type=arg_type, default=None, help=help_text)
